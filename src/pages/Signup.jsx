@@ -19,7 +19,7 @@ export default function SignUp() {
     setError("");
     setLoading(true);
     try {
-      await axios.post("http://localhost:7000/api/users/signup", {
+      await axios.post("https://healthplanner-backend.onrender.com/api/users/signup", {
         name,
         username,
         email,
@@ -39,7 +39,7 @@ export default function SignUp() {
     setError("");
     setLoading(true);
     try {
-      await axios.post("http://localhost:7000/api/users/verify-signup-otp", {
+      await axios.post("https://healthplanner-backend.onrender.com/api/users/verify-signup-otp", {
         email,
         otp,
       });
@@ -55,7 +55,7 @@ export default function SignUp() {
     setError("");
     setLoading(true);
     try {
-      await axios.post("http://localhost:7000/api/users/resend-otp", { email });
+      await axios.post("https://healthplanner-backend.onrender.com/api/users/resend-otp", { email });
       alert("OTP resent successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to resend OTP");
