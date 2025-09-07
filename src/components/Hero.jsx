@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/heroImage.png";
+import heroImage from "@/assets/HeroImage.png";
 import { ChevronDown } from "lucide-react";
 import Features from "./Feature";
 import Pricing from "./Pricing";

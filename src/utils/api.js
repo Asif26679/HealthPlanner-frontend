@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:7000/api", // adjust if backend URL changes
+  baseURL: "https://healthplanner-backend.onrender.com", // adjust if backend URL changes
 });
 
 // Add token to every request
