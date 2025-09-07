@@ -78,7 +78,7 @@ export default function Dashboard() {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
 
-        const res = await axios.get("http://localhost:7000/api/dites", {
+        const res = await api.get("/dites", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -138,15 +138,15 @@ export default function Dashboard() {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       if (editDiet) {
-        const res = await axios.put(
-          `http://localhost:7000/api/dites/${editDiet._id}`,
+        const res = await api.put(
+          `/dites/${editDiet._id}`,
           { title: dietTitle, meals },
           config
         );
         setDiets(diets.map((d) => (d._id === res.data._id ? res.data : d)));
       } else {
-        const res = await axios.post(
-          "http://localhost:7000/api/dites",
+        const res = await api.post(
+          "/dites",
           { title: dietTitle, meals },
           config
         );
@@ -167,7 +167,7 @@ export default function Dashboard() {
     if (!window.confirm("Are you sure you want to delete this diet?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:7000/api/dites/${id}`, {
+      await api.delete(`/dites/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDiets(diets.filter((d) => d._id !== id));
