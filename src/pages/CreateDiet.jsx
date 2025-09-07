@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import api from "../utils/api"; 
 export default function CreateDiet() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -32,8 +32,8 @@ export default function CreateDiet() {
         return;
       }
 
-      const res = await axios.post(
-        "http://localhost:7000/api/dites",
+      const res = await api.post(
+        "/dites",
         { title, meals },
         { headers: { Authorization: `Bearer ${token}` } }
       );

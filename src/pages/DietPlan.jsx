@@ -1,6 +1,7 @@
 // src/pages/DietPlan.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import api from "../utils/api"; 
 
 export default function DietPlan() {
   const { id } = useParams();
@@ -9,7 +10,7 @@ export default function DietPlan() {
   useEffect(() => {
     const fetchDiet = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+        const res = await api.get(`/users/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
