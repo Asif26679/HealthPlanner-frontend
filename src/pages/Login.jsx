@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,18 +24,11 @@ export default function Login() {
     }
 
     try {
-      const { data } = await axios.post("https://healthplanner-backend.onrender.com/api/users/login", {
-        email,
-        password,
-      });
-
-      // Save in context and localStorage
+      const { data } = await api.post("/users/login", { email, password });
       login(data.user, data.token);
-
       navigate("/dashboard");
     } catch (err) {
-      const msg = err.response?.data?.message || "Login failed";
-      setError(msg);
+      setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -45,9 +38,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
       <div className="bg-gray-800/70 backdrop-blur-md rounded-3xl p-8 max-w-md w-full">
         <h2 className="text-3xl text-white font-extrabold text-center mb-6">Login</h2>
-
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
         <form onSubmit={handleSubmit} className="flex flex-col space-y-5">
           <input
             type="email"
@@ -73,7 +64,6 @@ export default function Login() {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-
         <p className="text-gray-400 text-center mt-4 text-sm">
           Don't have an account?{" "}
           <span
