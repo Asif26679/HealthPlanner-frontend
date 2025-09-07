@@ -24,7 +24,7 @@ export default function Login() {
     }
 
     try {
-      const { data } = await axios.post("http://localhost:7000/api/users/login", {
+      const { data } = await axios.post("https://healthplanner-backend.onrender.com/api/users/login", {
         email,
         password,
       });
