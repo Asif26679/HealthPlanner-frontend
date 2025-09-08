@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://healthplanner-backend.onrender.com", 
+  baseURL: "https://healthplanner-backend.onrender.com/api", 
 });
 
 // Add token to every request
