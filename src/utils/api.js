@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://healthplanner-backend.onrender.com/api", 
+  baseURL: import.meta.env.VITE_API_BASE_URL, // ✅ now dynamic
 });
 
 // Add token to every request
