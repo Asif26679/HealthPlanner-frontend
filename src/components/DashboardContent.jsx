@@ -15,6 +15,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import api from "../utils/api";
 
 // Animated Number Component
 const AnimatedNumber = ({ value, duration = 1.2, className }) => {
