@@ -49,7 +49,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [diets, setDiets] = useState([]);
   const [workouts, setWorkouts] = useState([]);
-  const [water, setWater] = useState(0);
+  const [water, setWater] = useState(1200);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showDietModal, setShowDietModal] = useState(false);
   const [editDiet, setEditDiet] = useState(null);
@@ -57,72 +57,53 @@ export default function Dashboard() {
   const [meals, setMeals] = useState([{ name: "", calories: "" }]);
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [user, setUser] = useState(null);
+  const [collapsedDiets, setCollapsedDiets] = useState({}); // For mobile collapse
 
-  // Load user from localStorage
+  // Load user
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (!storedUser) navigate("/login");
     else setUser(storedUser);
   }, [navigate]);
 
-  // Fetch diets, workouts, water from backend
+  // Fetch diets/workouts
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDiets = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
 
-        // Diets
-        const dietsRes = await api.get("/dites", {
+        const res = await api.get("/dites", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setDiets(dietsRes.data || []);
 
-        // Water
-        const waterRes = await api.get("/water", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setWater(waterRes.data.amount || 0);
-
-        // Example Workouts
-        setWorkouts([
-          { _id: 1, title: "Morning Run", duration: 30, caloriesBurned: 250 },
-          { _id: 2, title: "Strength Training", duration: 45, caloriesBurned: 400 },
-        ]);
+        if (res.data.length > 0) setDiets(res.data);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchData();
+    fetchDiets();
+    setWorkouts([
+      { _id: 1, title: "Morning Run", duration: 30, caloriesBurned: 250 },
+      { _id: 2, title: "Strength Training", duration: 45, caloriesBurned: 400 },
+    ]);
   }, [navigate]);
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login");
   };
 
-  // Water handlers
-  const updateWater = async (amount) => {
-    try {
-      const token = localStorage.getItem("token");
-      await api.post("/water/add", { amount }, { headers: { Authorization: `Bearer ${token}` } });
-      setWater((prev) => Math.min(prev + amount, 2500));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const resetWater = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await api.post("/water/reset", {}, { headers: { Authorization: `Bearer ${token}` } });
-      setWater(0);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // Water reset at midnight
+  useEffect(() => {
+    const now = new Date();
+    const millisTillMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+    const timer = setTimeout(() => setWater(0), millisTillMidnight);
+    return () => clearTimeout(timer);
+  }, [water]);
 
   // Meal handlers
   const handleMealChange = (index, field, value) => {
@@ -133,7 +114,6 @@ export default function Dashboard() {
   const addMeal = () => setMeals([...meals, { name: "", calories: "" }]);
   const removeMeal = (index) => setMeals(meals.filter((_, i) => i !== index));
 
-  // Open modal
   const openCreateModal = () => {
     setEditDiet(null);
     setDietTitle("");
@@ -147,7 +127,6 @@ export default function Dashboard() {
     setShowDietModal(true);
   };
 
-  // Create or update diet
   const handleSaveDiet = async (e) => {
     e.preventDefault();
     setLoadingDiet(true);
@@ -155,22 +134,14 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
 
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       if (editDiet) {
-        const res = await api.put(
-          `/dites/${editDiet._id}`,
-          { title: dietTitle, meals },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await api.put(`/dites/${editDiet._id}`, { title: dietTitle, meals }, config);
         setDiets(diets.map((d) => (d._id === res.data._id ? res.data : d)));
       } else {
-        const res = await api.post(
-          "/dites",
-          { title: dietTitle, meals },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await api.post("/dites", { title: dietTitle, meals }, config);
         setDiets([...diets, res.data]);
       }
-
       setShowDietModal(false);
     } catch (err) {
       console.error(err);
@@ -180,7 +151,6 @@ export default function Dashboard() {
     }
   };
 
-  // Delete diet
   const handleDeleteDiet = async (id) => {
     if (!window.confirm("Are you sure you want to delete this diet?")) return;
     try {
@@ -193,24 +163,30 @@ export default function Dashboard() {
     }
   };
 
+  const toggleCollapseDiet = (id) => {
+    setCollapsedDiets((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-neutral-900 via-black to-neutral-950 text-white">
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-neutral-950 border-r border-neutral-800 flex-col justify-between py-6 px-4 shadow-xl">
-        <nav className="space-y-3 mt-10">
-          <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
-            <LayoutDashboard className="w-5 h-5" /> Dashboard
-          </Link>
-          <Link to="/profile" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
-            <User className="w-5 h-5" /> Profile
-          </Link>
-          <Link to="/workouts" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
-            <Dumbbell className="w-5 h-5" /> Workouts
-          </Link>
-          <Link to="/water" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
-            <Droplets className="w-5 h-5" /> Water Intake
-          </Link>
-        </nav>
+        <div className="mt-10">
+          <nav className="space-y-3">
+            <Link to="/dashboard" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+              <LayoutDashboard className="w-5 h-5" /> Dashboard
+            </Link>
+            <Link to="/profile" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+              <User className="w-5 h-5" /> Profile
+            </Link>
+            <Link to="/workouts" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+              <Dumbbell className="w-5 h-5" /> Workouts
+            </Link>
+            <Link to="/water" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+              <Droplets className="w-5 h-5" /> Water Intake
+            </Link>
+          </nav>
+        </div>
         <div className="mt-auto space-y-3">
           <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-neutral-800 shadow-sm">
             <User className="w-6 h-6 text-green-400" />
@@ -225,13 +201,27 @@ export default function Dashboard() {
       {/* Mobile Sidebar */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} className="fixed inset-y-0 right-0 w-64 bg-neutral-950 z-50 shadow-xl p-6 flex flex-col justify-between md:hidden">
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            className="fixed inset-y-0 right-0 w-64 bg-neutral-950 z-50 shadow-xl p-6 flex flex-col justify-between md:hidden"
+          >
             <nav className="space-y-3 mt-10">
-              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><LayoutDashboard className="w-5 h-5" /> Dashboard</Link>
-              <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><User className="w-5 h-5" /> Profile</Link>
-              <Link to="/workouts" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><Dumbbell className="w-5 h-5" /> Workouts</Link>
-              <Link to="/water" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><Droplets className="w-5 h-5" /> Water Intake</Link>
+              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+                <LayoutDashboard className="w-5 h-5" /> Dashboard
+              </Link>
+              <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+                <User className="w-5 h-5" /> Profile
+              </Link>
+              <Link to="/workouts" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+                <Dumbbell className="w-5 h-5" /> Workouts
+              </Link>
+              <Link to="/water" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+                <Droplets className="w-5 h-5" /> Water Intake
+              </Link>
             </nav>
+
             <div className="mt-auto space-y-3">
               <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-neutral-800 shadow-sm">
                 <User className="w-6 h-6 text-green-400" />
@@ -248,13 +238,20 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-10 pt-20 md:pt-10 overflow-y-auto">
         {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-9">{user ? `Welcome, ${user.name}` : "Welcome"}</h1>
-          <p className="text-gray-400 mt-2">Track your fitness progress and daily goals.</p>
+        <header className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-9">{user ? `Welcome, ${user.name}` : "Welcome"}</h1>
+            <p className="text-gray-400 mt-2">Track your fitness progress and daily goals.</p>
+          </div>
+          {/* Hamburger */}
+          <button className="md:hidden text-white p-2 rounded-md" onClick={() => setMobileMenuOpen(true)}>
+            <Menu size={28} />
+          </button>
         </header>
 
-        {/* Dashboard Grid */}
+        {/* Dashboard Sections */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
           {/* Diet Plans */}
           <div className="col-span-1 lg:col-span-2 bg-neutral-900 rounded-3xl shadow-2xl p-4 sm:p-6 border border-neutral-800">
             <div className="flex flex-col sm:flex-row justify-between mb-4 gap-3">
@@ -266,44 +263,58 @@ export default function Dashboard() {
 
             <div className="flex flex-col gap-4">
               {diets.map((diet) => (
-                <motion.div key={diet._id} whileHover={{ scale: 1.02 }} className="bg-gradient-to-r from-green-700 via-green-900 to-green-700 p-4 sm:p-6 rounded-2xl shadow-lg relative border border-green-500">
-                  <h3 className="text-lg md:text-xl font-bold text-white mb-2">{diet.title}</h3>
-                  <p className="text-gray-200 mb-4">Total Calories: <AnimatedNumber value={diet.totalCalories} className="font-bold text-yellow-400" /></p>
-                  <ul className="flex flex-col gap-2">
-                    {diet.meals.map((meal, i) => (
-                      <li key={i} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-green-900/30 p-3 rounded-lg shadow-sm hover:bg-green-900/50 transition">
-                        <span className="flex items-center gap-2">{getMealIcon(meal.name)} {meal.name}</span>
-                        <span className="text-sm text-gray-200 mt-1 sm:mt-0">{meal.calories} kcal</span>
-                      </li>
-                    ))}
-                  </ul>
+                <motion.div key={diet._id} whileHover={{ scale: 1.02 }} className="bg-gradient-to-r from-green-700 via-green-900 to-green-700 p-4 sm:p-6 rounded-2xl shadow-lg relative border border-green-500 overflow-hidden"
+                  drag="x"
+                  dragConstraints={{ left: -50, right: 50 }}
+                >
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg md:text-xl font-bold text-white mb-2">{diet.title}</h3>
+                    <button className="text-gray-200 text-sm md:hidden" onClick={() => toggleCollapseDiet(diet._id)}>
+                      {collapsedDiets[diet._id] ? "▼" : "▲"}
+                    </button>
+                  </div>
+
+                  <AnimatePresence>
+                    {(!collapsedDiets[diet._id]) && (
+                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mt-2">
+                        <p className="text-gray-200 mb-4">Total Calories: <AnimatedNumber value={diet.totalCalories} className="font-bold text-yellow-400" /></p>
+                        <ul className="flex flex-col gap-2">
+                          {diet.meals.map((meal, i) => (
+                            <li key={i} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-green-900/30 p-3 rounded-lg shadow-sm hover:bg-green-900/50 transition">
+                              <span className="flex items-center gap-2">{getMealIcon(meal.name)} {meal.name}</span>
+                              <span className="text-sm text-gray-200 mt-1 sm:mt-0">{meal.calories} kcal</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <div className="absolute top-4 right-4 flex gap-2 flex-wrap sm:flex-nowrap">
-                    <button onClick={() => openEditModal(diet)} className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto">Edit</button>
-                    <button onClick={() => handleDeleteDiet(diet._id)} className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto">Delete</button>
+                    <button className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto" onClick={() => openEditModal(diet)}>Edit</button>
+                    <button className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto" onClick={() => handleDeleteDiet(diet._id)}>Delete</button>
                   </div>
                 </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Water Intake */}
+          {/* Water Tracker */}
           <div className="bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-neutral-800 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-blue-400"><Droplets className="w-6 h-6" /> Water Plan</h2>
               <span className="text-gray-400 text-sm">Daily Goal: 2500ml</span>
             </div>
-
             <div className="flex flex-col items-center justify-center mt-6">
-              <p className="text-gray-200 text-lg font-medium">{water} ml <span className="text-gray-400 text-sm"> / 2500 ml</span></p>
+              <p className="text-gray-200 text-lg font-medium">{water} ml <span className="text-gray-400 text-sm">/ 2500 ml</span></p>
               <div className="w-full bg-gray-700 rounded-full h-3 mt-3">
                 <div className="bg-blue-500 h-3 rounded-full transition-all duration-500" style={{ width: `${(water / 2500) * 100}%` }}></div>
               </div>
             </div>
-
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
-              <button onClick={() => updateWater(250)} className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base">+250ml</button>
-              <button onClick={() => updateWater(500)} className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base">+500ml</button>
-              <button onClick={resetWater} className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base">Reset</button>
+              <button onClick={() => setWater(prev => Math.min(prev + 250, 2500))} className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base w-full sm:w-auto">+250ml</button>
+              <button onClick={() => setWater(prev => Math.min(prev + 500, 2500))} className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base w-full sm:w-auto">+500ml</button>
+              <button onClick={() => setWater(0)} className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base w-full sm:w-auto">Reset</button>
             </div>
           </div>
         </div>
@@ -312,21 +323,48 @@ export default function Dashboard() {
       {/* Diet Modal */}
       <AnimatePresence>
         {showDietModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="bg-gray-800 p-6 rounded-2xl w-full max-w-xl relative">
-              <button onClick={() => setShowDietModal(false)} className="absolute top-4 right-4 text-red-500 hover:text-white"><X size={24} /></button>
-              <h2 className="text-2xl font-bold text-white mb-4">{editDiet ? "Edit Diet Plan" : "Create Diet Plan"}</h2>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }} className="bg-neutral-900 rounded-3xl p-6 w-full max-w-md shadow-xl overflow-y-auto max-h-[90vh]">
+              <h3 className="text-xl font-bold mb-4 text-green-400">{editDiet ? "Edit Diet" : "Create Diet"}</h3>
               <form onSubmit={handleSaveDiet} className="flex flex-col gap-4">
-                <input type="text" placeholder="Title (Ex-Weight Gain)" value={dietTitle} onChange={(e) => setDietTitle(e.target.value)} className="bg-gray-700 text-white rounded-xl px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500" required />
-                {meals.map((meal, i) => (
-                  <div key={i} className="flex gap-2 items-center">
-                    <input type="text" placeholder="Meal Name" value={meal.name} onChange={(e) => handleMealChange(i, "name", e.target.value)} className="flex-1 bg-gray-700 text-white rounded-xl px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500" required />
-                    <input type="number" placeholder="Calories" value={meal.calories} onChange={(e) => handleMealChange(i, "calories", e.target.value)} className="w-24 bg-gray-700 text-white rounded-xl px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500" required />
-                    {meals.length > 1 && <button type="button" onClick={() => removeMeal(i)} className="bg-red-500 hover:bg-red-600 px-2 py-1 rounded-lg text-white">X</button>}
-                  </div>
-                ))}
-                <button type="button" onClick={addMeal} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl w-full">+ Add Meal</button>
-                <button type="submit" disabled={loadingDiet} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl w-full">{loadingDiet ? "Saving..." : "Save Diet"}</button>
+                <input
+                  type="text"
+                  value={dietTitle}
+                  onChange={(e) => setDietTitle(e.target.value)}
+                  placeholder="Diet Title"
+                  className="w-full p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+                <div className="flex flex-col gap-3">
+                  {meals.map((meal, i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <input
+                        type="text"
+                        value={meal.name}
+                        onChange={(e) => handleMealChange(i, "name", e.target.value)}
+                        placeholder="Meal Name"
+                        className="flex-1 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                      />
+                      <input
+                        type="number"
+                        value={meal.calories}
+                        onChange={(e) => handleMealChange(i, "calories", e.target.value)}
+                        placeholder="Calories"
+                        className="w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        required
+                      />
+                      {meals.length > 1 && (
+                        <button type="button" onClick={() => removeMeal(i)} className="text-red-500 px-2">X</button>
+                      )}
+                    </div>
+                  ))}
+                  <button type="button" onClick={addMeal} className="text-blue-400 text-sm self-start">+ Add Meal</button>
+                </div>
+                <div className="flex justify-end gap-3 mt-4">
+                  <button type="button" onClick={() => setShowDietModal(false)} className="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600">Cancel</button>
+                  <button type="submit" disabled={loadingDiet} className="px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white">{editDiet ? "Update" : "Save"}</button>
+                </div>
               </form>
             </motion.div>
           </motion.div>
