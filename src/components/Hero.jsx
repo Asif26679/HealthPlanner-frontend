@@ -59,7 +59,7 @@ export default function Hero() {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: [0, -20, 0], opacity: 1 }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className=" mt-20 relative w-[280px] md:w-[520px] drop-shadow-[0_0_40px_rgba(0,255,150,0.4)]"
+        className=" mt-14 relative w-[280px] md:w-[520px] drop-shadow-[0_0_40px_rgba(0,255,150,0.4)]"
       >
         <img
           src={heroImage}

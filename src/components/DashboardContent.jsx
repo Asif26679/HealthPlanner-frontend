@@ -104,7 +104,25 @@ export default function Dashboard() {
     localStorage.removeItem("user");
     navigate("/login");
   };
-
+  // Water Track
+  useEffect(() => {
+    // Ask for notification permission
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  
+    // Reminder every 2 hours
+    const reminder = setInterval(() => {
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("💧 Hydration Reminder", {
+          body: "Time to drink some water!",
+          icon: "/water.png", // optional: put a water icon in public folder
+        });
+      }
+    }, 2 * 60 * 60 * 1000); // every 2 hours
+  
+    return () => clearInterval(reminder);
+  }, []);
   // Meal handlers
   const handleMealChange = (index, field, value) => {
     const updated = [...meals];
@@ -308,6 +326,42 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        {/* 💧 Water Intake Tracker */}
+<div className="bg-neutral-900 rounded-3xl shadow-2xl p-4 sm:p-6 border border-neutral-800">
+  <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-blue-400">
+    <Droplets /> Water Plan
+  </h2>
+
+  {/* Progress */}
+  <div className="flex flex-col items-center justify-center mt-6">
+    <p className="text-gray-300 text-lg">
+      {water} ml / 2500 ml
+    </p>
+    <div className="w-full bg-gray-700 rounded-full h-3 mt-3">
+      <div
+        className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+        style={{ width: `${(water / 2500) * 100}%` }}
+      ></div>
+    </div>
+  </div>
+
+  {/* Buttons */}
+  <div className="flex justify-center gap-4 mt-6">
+    <button
+      onClick={() => setWater((prev) => Math.min(prev + 250, 2500))}
+      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md"
+    >
+      +250ml
+    </button>
+    <button
+      onClick={() => setWater((prev) => Math.min(prev + 500, 2500))}
+      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md"
+    >
+      +500ml
+    </button>
+  </div>
+</div>
+
       </main>
 
       {/* Diet Modal */}
