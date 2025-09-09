@@ -112,14 +112,14 @@ export default function Dashboard() {
     }
   
     // Reminder every 2 hours
-    const reminder = setInterval(() => {
-      if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("💧 Hydration Reminder", {
-          body: "Time to drink some water!",
-          icon: "/water.png", // optional: put a water icon in public folder
-        });
-      }
-    }, 2 * 60 * 60 * 1000); // every 2 hours
+    // const reminder = setInterval(() => {
+    //   if ("Notification" in window && Notification.permission === "granted") {
+    //     new Notification("💧 Hydration Reminder", {
+    //       body: "Time to drink some water!",
+    //       icon: "/water.png", // optional: put a water icon in public folder
+    //     });
+    //   }
+    // }, 2 * 60 * 60 * 1000); // every 2 hours
   
     return () => clearInterval(reminder);
   }, []);
@@ -326,16 +326,21 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-        {/* 💧 Water Intake Tracker */}
-<div className="bg-neutral-900 rounded-3xl shadow-2xl p-4 sm:p-6 border border-neutral-800">
-  <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-blue-400">
-    <Droplets /> Water Plan
-  </h2>
+{/* 💧 Water Intake Tracker */}
+<div className="bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-neutral-800 flex flex-col justify-between">
+  {/* Header */}
+  <div className="flex items-center justify-between">
+    <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-blue-400">
+      <Droplets className="w-6 h-6" /> Water Plan
+    </h2>
+    <span className="text-gray-400 text-sm">Daily Goal: 2500ml</span>
+  </div>
 
   {/* Progress */}
   <div className="flex flex-col items-center justify-center mt-6">
-    <p className="text-gray-300 text-lg">
-      {water} ml / 2500 ml
+    <p className="text-gray-200 text-lg font-medium">
+      {water} ml
+      <span className="text-gray-400 text-sm"> / 2500 ml</span>
     </p>
     <div className="w-full bg-gray-700 rounded-full h-3 mt-3">
       <div
@@ -349,18 +354,19 @@ export default function Dashboard() {
   <div className="flex justify-center gap-4 mt-6">
     <button
       onClick={() => setWater((prev) => Math.min(prev + 250, 2500))}
-      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md"
+      className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base"
     >
       +250ml
     </button>
     <button
       onClick={() => setWater((prev) => Math.min(prev + 500, 2500))}
-      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md"
+      className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base"
     >
       +500ml
     </button>
   </div>
 </div>
+
 
       </main>
 
