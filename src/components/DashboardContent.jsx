@@ -11,7 +11,6 @@ import {
   Coffee,
   Apple,
 } from "lucide-react";
-import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
@@ -191,7 +190,7 @@ export default function Dashboard() {
             <Link to="/profile" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
               <User className="w-5 h-5" /> Profile
             </Link>
-            <Link to="/workout" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
+            <Link to="/workouts" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
               <Dumbbell className="w-5 h-5" /> Workouts
             </Link>
             <Link to="/water" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition">
@@ -237,7 +236,7 @@ export default function Dashboard() {
         </Link>
 
         <Link
-          to="/workout"
+          to="/workouts"
           onClick={() => setMobileMenuOpen(false)}
           className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
         >
