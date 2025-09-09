@@ -59,6 +59,7 @@ export default function Dashboard() {
   const [meals, setMeals] = useState([{ name: "", calories: "" }]);
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [user, setUser] = useState(null);
+  
 
   const COLORS = ["#3b82f6", "#1e293b"];
 
@@ -211,26 +212,62 @@ export default function Dashboard() {
 
       {/* Mobile Sidebar */}
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} className="fixed inset-y-0 right-0 w-64 bg-neutral-950 z-50 shadow-xl p-6 flex flex-col justify-between md:hidden">
-            <nav className="space-y-3 mt-10">
-              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><LayoutDashboard className="w-5 h-5" /> Dashboard</Link>
-              <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><Salad className="w-5 h-5" /> Profile</Link>
-              <Link to="/workout" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><Dumbbell className="w-5 h-5" /> Workouts</Link>
-              <Link to="/water" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"><Droplets className="w-5 h-5" /> Water Intake</Link>
-            </nav>
-            <div className="mt-auto space-y-3">
-              <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-neutral-800 shadow-sm">
-                <User className="w-6 h-6 text-green-400" />
-                <span className="text-gray-200 font-medium">{user ? `Welcome, ${user.name}` : "Welcome"}</span>
-              </div>
-              <button className="flex items-center gap-3 px-4 py-2 rounded-xl text-red-500 hover:bg-neutral-800 transition w-full shadow-sm" onClick={handleLogout}>
-                <LogOut className="w-5 h-5" /> Logout
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  {mobileMenuOpen && (
+    <motion.div
+      initial={{ x: "100%" }}
+      animate={{ x: 0 }}
+      exit={{ x: "100%" }}
+      className="fixed inset-y-0 right-0 w-64 bg-neutral-950 z-50 shadow-xl p-6 flex flex-col justify-between md:hidden"
+    >
+      <nav className="space-y-3 mt-10">
+        <Link
+          to="/dashboard"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
+        >
+          <LayoutDashboard className="w-5 h-5" /> Dashboard
+        </Link>
+
+        <Link
+          to="/profile"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
+        >
+          <User className="w-5 h-5" /> Profile
+        </Link>
+
+        <Link
+          to="/workout"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
+        >
+          <Dumbbell className="w-5 h-5" /> Workouts
+        </Link>
+
+        <Link
+          to="/water"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
+        >
+          <Droplets className="w-5 h-5" /> Water Intake
+        </Link>
+      </nav>
+
+      <div className="mt-auto space-y-3">
+        <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-neutral-800 shadow-sm">
+          <User className="w-6 h-6 text-green-400" />
+          <span className="text-gray-200 font-medium">{user ? `Welcome, ${user.name}` : "Welcome"}</span>
+        </div>
+        <button
+          className="flex items-center gap-3 px-4 py-2 rounded-xl text-red-500 hover:bg-neutral-800 transition w-full shadow-sm"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-5 h-5" /> Logout
+        </button>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
       {/* Main Content */}
       <main className="flex-1 p-4 md:p-10 pt-20 md:pt-10 overflow-y-auto">
