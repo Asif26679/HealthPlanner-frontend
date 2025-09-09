@@ -67,7 +67,7 @@ export default function Stats() {
           className="text-4xl md:text-5xl font-bold text-center mb-16"
         >
           Trusted by Thousands of{" "}
-          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <span className="text-green-600 bg-clip-text">
             Users Worldwide
           </span>
         </motion.h2>

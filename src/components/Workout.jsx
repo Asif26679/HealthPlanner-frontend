@@ -34,6 +34,8 @@ export default function Workouts() {
       id="workouts"
       className="relative py-20 px-6 md:px-20 bg-gradient-to-b from-gray-900 via-black to-gray-950"
     >
+      <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-green-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-green-400/10 rounded-full blur-2xl animate-pulse"></div>
       <div className="max-w-6xl mx-auto text-center">
         <motion.h2
           initial={{ y: 40, opacity: 0 }}
