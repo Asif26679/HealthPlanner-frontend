@@ -55,6 +55,8 @@ export default function Stats() {
 
   return (
     <section className="bg-gray-950 text-white py-24 relative">
+      <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-green-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-green-400/10 rounded-full blur-2xl animate-pulse"></div>
       <div className="max-w-7xl mx-auto px-6">
         {/* Title */}
         <motion.h2
