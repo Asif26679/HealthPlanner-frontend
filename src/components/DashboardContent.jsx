@@ -105,11 +105,11 @@ export default function Dashboard() {
     navigate("/login");
   };
   // Water Track
-  useEffect(() => {
-    // Ask for notification permission
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
+  // useEffect(() => {
+  //   // Ask for notification permission
+  //   if ("Notification" in window && Notification.permission !== "granted") {
+  //     Notification.requestPermission();
+  //   }
   
     // Reminder every 2 hours
     // const reminder = setInterval(() => {
@@ -121,8 +121,18 @@ export default function Dashboard() {
     //   }
     // }, 2 * 60 * 60 * 1000); // every 2 hours
   
-    return () => clearInterval(reminder);
-  }, []);
+  //   return () => clearInterval(reminder);
+  // }, []);
+  useEffect(() => {
+    const now = new Date();
+    const millisTillMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0) - now;
+  
+    const timer = setTimeout(() => setWater(0), millisTillMidnight);
+  
+    return () => clearTimeout(timer);
+  }, [water]);
+  
   // Meal handlers
   const handleMealChange = (index, field, value) => {
     const updated = [...meals];
@@ -295,77 +305,124 @@ export default function Dashboard() {
         </header>
 
         {/* Diet Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="col-span-1 lg:col-span-2 bg-neutral-900 rounded-3xl shadow-2xl p-4 sm:p-6 border border-neutral-800">
-            <div className="flex flex-col sm:flex-row justify-between mb-4 gap-3">
-              <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-green-400"><Salad /> Diet Plans</h2>
-              <button onClick={openCreateModal} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow-md transition w-full sm:w-auto">+ Create Diet</button>
-            </div>
+       {/* Diet + Water Section */}
+<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {/* Diet Plans */}
+  <div className="col-span-1 lg:col-span-2 bg-neutral-900 rounded-3xl shadow-2xl p-4 sm:p-6 border border-neutral-800">
+    <div className="flex flex-col sm:flex-row justify-between mb-4 gap-3">
+      <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-green-400">
+        <Salad /> Diet Plans
+      </h2>
+      <button
+        onClick={openCreateModal}
+        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow-md transition w-full sm:w-auto"
+      >
+        + Create Diet
+      </button>
+    </div>
 
-            {diets.length === 0 && <p className="text-gray-400 text-center py-6">No diets yet.</p>}
+    {diets.length === 0 && (
+      <p className="text-gray-400 text-center py-6">No diets yet.</p>
+    )}
 
-            <div className="flex flex-col gap-4">
-              {diets.map((diet) => (
-                <motion.div key={diet._id} whileHover={{ scale: 1.02 }} className="bg-gradient-to-r from-green-700 via-green-900 to-green-700 p-4 sm:p-6 rounded-2xl shadow-lg relative border border-green-500">
-                  <h3 className="text-lg md:text-xl font-bold text-white mb-2">{diet.title}</h3>
-                  <p className="text-gray-200 mb-4">Total Calories: <AnimatedNumber value={diet.totalCalories} className="font-bold text-yellow-400" /></p>
-                  <ul className="flex flex-col gap-2">
-                    {diet.meals.map((meal, i) => (
-                      <li key={i} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-green-900/30 p-3 rounded-lg shadow-sm hover:bg-green-900/50 transition">
-                        <span className="flex items-center gap-2">{getMealIcon(meal.name)} {meal.name}</span>
-                        <span className="text-sm text-gray-200 mt-1 sm:mt-0">{meal.calories} kcal</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="absolute top-4 right-4 flex gap-2 flex-wrap sm:flex-nowrap">
-                    <button className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto" onClick={() => openEditModal(diet)}>Edit</button>
-                    <button className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto" onClick={() => handleDeleteDiet(diet._id)}>Delete</button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+    <div className="flex flex-col gap-4">
+      {diets.map((diet) => (
+        <motion.div
+          key={diet._id}
+          whileHover={{ scale: 1.02 }}
+          className="bg-gradient-to-r from-green-700 via-green-900 to-green-700 p-4 sm:p-6 rounded-2xl shadow-lg relative border border-green-500"
+        >
+          <h3 className="text-lg md:text-xl font-bold text-white mb-2">
+            {diet.title}
+          </h3>
+          <p className="text-gray-200 mb-4">
+            Total Calories:{" "}
+            <AnimatedNumber
+              value={diet.totalCalories}
+              className="font-bold text-yellow-400"
+            />
+          </p>
+          <ul className="flex flex-col gap-2">
+            {diet.meals.map((meal, i) => (
+              <li
+                key={i}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-green-900/30 p-3 rounded-lg shadow-sm hover:bg-green-900/50 transition"
+              >
+                <span className="flex items-center gap-2">
+                  {getMealIcon(meal.name)} {meal.name}
+                </span>
+                <span className="text-sm text-gray-200 mt-1 sm:mt-0">
+                  {meal.calories} kcal
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="absolute top-4 right-4 flex gap-2 flex-wrap sm:flex-nowrap">
+            <button
+              className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto"
+              onClick={() => openEditModal(diet)}
+            >
+              Edit
+            </button>
+            <button
+              className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm shadow-md transition w-full sm:w-auto"
+              onClick={() => handleDeleteDiet(diet._id)}
+            >
+              Delete
+            </button>
           </div>
-        </div>
-{/* 💧 Water Intake Tracker */}
-<div className="bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-neutral-800 flex flex-col justify-between">
-  {/* Header */}
-  <div className="flex items-center justify-between">
-    <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-blue-400">
-      <Droplets className="w-6 h-6" /> Water Plan
-    </h2>
-    <span className="text-gray-400 text-sm">Daily Goal: 2500ml</span>
-  </div>
-
-  {/* Progress */}
-  <div className="flex flex-col items-center justify-center mt-6">
-    <p className="text-gray-200 text-lg font-medium">
-      {water} ml
-      <span className="text-gray-400 text-sm"> / 2500 ml</span>
-    </p>
-    <div className="w-full bg-gray-700 rounded-full h-3 mt-3">
-      <div
-        className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-        style={{ width: `${(water / 2500) * 100}%` }}
-      ></div>
+        </motion.div>
+      ))}
     </div>
   </div>
 
-  {/* Buttons */}
-  <div className="flex justify-center gap-4 mt-6">
-    <button
-      onClick={() => setWater((prev) => Math.min(prev + 250, 2500))}
-      className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base"
-    >
-      +250ml
-    </button>
-    <button
-      onClick={() => setWater((prev) => Math.min(prev + 500, 2500))}
-      className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base"
-    >
-      +500ml
-    </button>
+  {/* 💧 Water Intake Tracker */}
+  <div className="bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-neutral-800 flex flex-col justify-between">
+    {/* Header */}
+    <div className="flex items-center justify-between">
+      <h2 className="flex items-center gap-2 text-xl md:text-2xl font-semibold text-blue-400">
+        <Droplets className="w-6 h-6" /> Water Plan
+      </h2>
+      <span className="text-gray-400 text-sm">Daily Goal: 2500ml</span>
+    </div>
+
+    {/* Progress */}
+    <div className="flex flex-col items-center justify-center mt-6">
+      <p className="text-gray-200 text-lg font-medium">
+        {water} ml <span className="text-gray-400 text-sm"> / 2500 ml</span>
+      </p>
+      <div className="w-full bg-gray-700 rounded-full h-3 mt-3">
+        <div
+          className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+          style={{ width: `${(water / 2500) * 100}%` }}
+        ></div>
+      </div>
+    </div>
+
+    {/* Buttons */}
+    <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+      <button
+        onClick={() => setWater((prev) => Math.min(prev + 250, 2500))}
+        className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base"
+      >
+        +250ml
+      </button>
+      <button
+        onClick={() => setWater((prev) => Math.min(prev + 500, 2500))}
+        className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base"
+      >
+        +500ml
+      </button>
+      <button
+        onClick={() => setWater(0)}
+        className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl shadow-md text-sm sm:text-base"
+      >
+        Reset
+      </button>
+    </div>
   </div>
 </div>
+
 
 
       </main>
