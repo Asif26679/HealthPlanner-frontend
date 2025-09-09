@@ -51,6 +51,8 @@ export default function Pricing() {
       id="pricing"
       className="relative py-20 px-6 md:px-20 bg-gradient-to-b from-gray-950 via-black to-gray-900"
     >
+      <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-green-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-green-400/10 rounded-full blur-2xl animate-pulse"></div>
       <div className="max-w-6xl mx-auto text-center">
         {/* Heading */}
         <motion.h2

@@ -45,7 +45,8 @@ export default function Hero() {
     <>
     
     <section className="relative min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-20 gap-12 bg-gradient-to-b from-gray-900 via-black to-gray-950 overflow-hidden">
-      
+    <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-green-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-green-400/10 rounded-full blur-2xl animate-pulse"></div>
       {/* ANIMATED GLOW BEHIND PHONE */}
       <motion.div
         initial={{ scale: 0.9, opacity: 0.6 }}
@@ -59,7 +60,7 @@ export default function Hero() {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: [0, -20, 0], opacity: 1 }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className=" mt-5 relative w-[280px] md:w-[520px] drop-shadow-[0_0_40px_rgba(0,255,150,0.4)]"
+        className=" mt-1 relative w-[280px] md:w-[520px] drop-shadow-[0_0_40px_rgba(0,255,150,0.4)]"
       >
         <img
           src={heroImage}
