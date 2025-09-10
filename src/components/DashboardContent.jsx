@@ -307,7 +307,7 @@ export default function Dashboard() {
             </ul>
           </div>
           {/* Diet Modal */}
-<AnimatePresence>
+          <AnimatePresence>
   {showDietModal && (
     <motion.div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
@@ -332,56 +332,55 @@ export default function Dashboard() {
             required
           />
 
-{meals.map((meal, i) => (
-  <div key={i} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full">
-    <input
-      type="text"
-      value={meal.name}
-      onChange={(e) => handleMealChange(i, "name", e.target.value)}
-      placeholder="Meal Name"
-      className="flex-1 p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-full"
-      required
-    />
-    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-      <input
-        type="number"
-        value={meal.calories}
-        onChange={(e) => handleMealChange(i, "calories", e.target.value)}
-        placeholder="Calories"
-        className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-        required
-      />
-      <input
-        type="number"
-        value={meal.protein}
-        onChange={(e) => handleMealChange(i, "protein", e.target.value)}
-        placeholder="Protein (g)"
-        className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-        required
-      />
-      <input
-        type="number"
-        value={meal.carbs}
-        onChange={(e) => handleMealChange(i, "carbs", e.target.value)}
-        placeholder="Carbs (g)"
-        className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-        required
-      />
-      <input
-        type="number"
-        value={meal.fats}
-        onChange={(e) => handleMealChange(i, "fats", e.target.value)}
-        placeholder="Fats (g)"
-        className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-        required
-      />
-    </div>
-    {meals.length > 1 && (
-      <button type="button" onClick={() => removeMeal(i)} className="text-red-500 mt-1 sm:mt-0">X</button>
-    )}
-  </div>
-))}
-
+          {meals.map((meal, i) => (
+            <div key={i} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full">
+              <input
+                type="text"
+                value={meal.name}
+                onChange={(e) => handleMealChange(i, "name", e.target.value)}
+                placeholder="Meal Name"
+                className="flex-1 p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-full"
+                required
+              />
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                <input
+                  type="number"
+                  value={meal.calories}
+                  onChange={(e) => handleMealChange(i, "calories", e.target.value)}
+                  placeholder="Calories"
+                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                  required
+                />
+                <input
+                  type="number"
+                  value={meal.protein}
+                  onChange={(e) => handleMealChange(i, "protein", e.target.value)}
+                  placeholder="Protein (g)"
+                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                  required
+                />
+                <input
+                  type="number"
+                  value={meal.carbs}
+                  onChange={(e) => handleMealChange(i, "carbs", e.target.value)}
+                  placeholder="Carbs (g)"
+                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                  required
+                />
+                <input
+                  type="number"
+                  value={meal.fats}
+                  onChange={(e) => handleMealChange(i, "fats", e.target.value)}
+                  placeholder="Fats (g)"
+                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                  required
+                />
+              </div>
+              {meals.length > 1 && (
+                <button type="button" onClick={() => removeMeal(i)} className="text-red-500 mt-1 sm:mt-0">X</button>
+              )}
+            </div>
+          ))}
 
           <button
             type="button"
@@ -412,6 +411,7 @@ export default function Dashboard() {
     </motion.div>
   )}
 </AnimatePresence>
+
         </div>
       </main>
     </div>
