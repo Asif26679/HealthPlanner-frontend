@@ -4,47 +4,33 @@ import { Instagram, Twitter, Facebook, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-gradient-to-b from-gray-950 to-gray-900 text-gray-300 py-16">
+    <footer className="relative bg-gradient-to-t from-gray-950 via-gray-900 to-gray-950 text-gray-300 py-16">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
         {/* Logo & About */}
         <div className="flex flex-col space-y-4">
-          <h2 className="text-3xl font-extrabold bg-gradient-to-r from-green-400 to-indigo-500 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-green-400 to-indigo-500 bg-clip-text text-transparent">
             HealthPlanner
           </h2>
           <p className="text-gray-400 leading-relaxed">
-            Building modern web experiences. Helping businesses and individuals grow 
-            with <span className="text-green-400 font-semibold">innovation</span> 
-            and <span className="text-indigo-400 font-semibold">design</span>.
+            Empowering your fitness journey with modern tools and insights. We help individuals and businesses grow through{" "}
+            <span className="text-green-400 font-semibold">innovation</span> and{" "}
+            <span className="text-indigo-400 font-semibold">design</span>.
           </p>
         </div>
 
         {/* Quick Links */}
         <div className="flex flex-col space-y-3">
-          <h3 className="text-white font-semibold text-lg mb-2">Quick Links</h3>
-          <a
-            href="#features"
-            className="hover:text-green-400 transition duration-300"
-          >
-            Features
-          </a>
-          <a
-            href="#pricing"
-            className="hover:text-green-400 transition duration-300"
-          >
-            Pricing
-          </a>
-          <a
-            href="#testimonials"
-            className="hover:text-green-400 transition duration-300"
-          >
-            Testimonials
-          </a>
-          <a
-            href="#contact"
-            className="hover:text-green-400 transition duration-300"
-          >
-            Contact
-          </a>
+          <h3 className="text-white font-semibold text-lg mb-3">Quick Links</h3>
+          {["Features", "Pricing", "Testimonials", "Contact"].map((link, idx) => (
+            <a
+              key={idx}
+              href={`#${link.toLowerCase()}`}
+              className="relative text-gray-300 hover:text-green-400 transition duration-300 group"
+            >
+              {link}
+              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-green-400 transition-all group-hover:w-full"></span>
+            </a>
+          ))}
         </div>
 
         {/* Social & Contact */}
@@ -61,7 +47,7 @@ export default function Footer() {
                 <a
                   key={idx}
                   href={link}
-                  className="p-2 rounded-full bg-gray-800 hover:bg-green-500 transition transform hover:scale-110"
+                  className="p-3 rounded-full bg-gray-800 hover:bg-gradient-to-tr hover:from-green-400 hover:to-indigo-500 transition transform hover:scale-110 shadow-lg"
                 >
                   <Icon className="w-5 h-5 text-white" />
                 </a>
@@ -71,10 +57,10 @@ export default function Footer() {
           <p className="text-gray-400 text-sm">
             Contact us:{" "}
             <a
-              href="mailto:info@yourbrand.com"
+              href="mailto:info@healthplanner.com"
               className="hover:text-green-400 font-medium transition"
             >
-              info@yourbrand.com
+              info@healthplanner.com
             </a>
           </p>
         </div>
@@ -89,4 +75,3 @@ export default function Footer() {
     </footer>
   );
 }
-
