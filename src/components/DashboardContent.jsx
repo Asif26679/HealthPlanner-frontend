@@ -51,13 +51,18 @@ const HighCalBadge = ({ calories }) => {
 };
 
 // Calculate total macros
+// Updated calculateTotalMacros
 const calculateTotalMacros = (meals) => {
-  return meals.reduce((acc, m) => ({
-    protein: acc.protein + (m.protein || 0),
-    carbs: acc.carbs + (m.carbs || 0),
-    fats: acc.fats + (m.fats || 0),
-  }), { protein: 0, carbs: 0, fats: 0 });
+  return meals.reduce(
+    (acc, m) => ({
+      protein: acc.protein + (m.protein || 0),
+      carbs: acc.carbs + (m.carbs || 0),
+      fats: acc.fats + (m.fats || 0),
+    }),
+    { protein: 0, carbs: 0, fats: 0 }
+  );
 };
+
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -122,7 +127,7 @@ export default function Dashboard() {
   // Meal handlers
   const handleMealChange = (index, field, value) => {
     const updated = [...meals];
-    updated[index][field] = ["calories", "protein", "carbs", "fats"].includes(field) ? Number(value) : value;
+    updated[index][field] = field === "calories" || field === "protein" || field === "carbs" || field === "fats" ? Number(value) : value;
     setMeals(updated);
   };
   const addMeal = () => setMeals([...meals, { name: "", calories: 0, protein: 0, carbs: 0, fats: 0 }]);
@@ -230,7 +235,11 @@ export default function Dashboard() {
 
             <div className="flex flex-col gap-4">
               {diets.map((diet) => {
-                const totalMacros = calculateTotalMacros(diet.meals);
+                 const totalMacros = {
+                  protein: diet.totalProtein || calculateTotalMacros(diet.meals).protein,
+                  carbs: diet.totalCarbs || calculateTotalMacros(diet.meals).carbs,
+                  fats: diet.totalFats || calculateTotalMacros(diet.meals).fats,
+                };
                 return (
                   <motion.div key={diet._id} whileHover={{ scale: 1.02 }} className="bg-gradient-to-r from-green-700 via-green-900 to-green-700 p-4 rounded-2xl shadow-lg relative border border-green-500 overflow-hidden">
                     <div className="flex justify-between items-center">
@@ -323,54 +332,53 @@ export default function Dashboard() {
             required
           />
 
-          {meals.map((meal, index) => (
-            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 bg-neutral-800 p-3 rounded-xl">
-              <input
-                type="text"
-                placeholder="Meal Name"
-                className="bg-neutral-700 p-2 rounded-xl text-white flex-1"
-                value={meal.name}
-                onChange={(e) => handleMealChange(index, "name", e.target.value)}
-                required
-              />
-              <input
-                type="number"
-                placeholder="Calories"
-                className="bg-neutral-700 p-2 rounded-xl text-white w-24"
-                value={meal.calories}
-                onChange={(e) => handleMealChange(index, "calories", e.target.value)}
-                required
-              />
-              <input
-                type="number"
-                placeholder="Protein"
-                className="bg-neutral-700 p-2 rounded-xl text-white w-20"
-                value={meal.protein}
-                onChange={(e) => handleMealChange(index, "protein", e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Carbs"
-                className="bg-neutral-700 p-2 rounded-xl text-white w-20"
-                value={meal.carbs}
-                onChange={(e) => handleMealChange(index, "carbs", e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Fats"
-                className="bg-neutral-700 p-2 rounded-xl text-white w-20"
-                value={meal.fats}
-                onChange={(e) => handleMealChange(index, "fats", e.target.value)}
-              />
-              <button
-                type="button"
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-xl"
-                onClick={() => removeMeal(index)}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+{meals.map((meal, i) => (
+  <div key={i} className="flex flex-col sm:flex-row gap-2 items-center">
+    <input
+      type="text"
+      value={meal.name}
+      onChange={(e) => handleMealChange(i, "name", e.target.value)}
+      placeholder="Meal Name"
+      className="flex-1 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+      required
+    />
+    <input
+      type="number"
+      value={meal.calories}
+      onChange={(e) => handleMealChange(i, "calories", e.target.value)}
+      placeholder="Calories"
+      className="w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+      required
+    />
+    <input
+      type="number"
+      value={meal.protein}
+      onChange={(e) => handleMealChange(i, "protein", e.target.value)}
+      placeholder="Protein (g)"
+      className="w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+      required
+    />
+    <input
+      type="number"
+      value={meal.carbs}
+      onChange={(e) => handleMealChange(i, "carbs", e.target.value)}
+      placeholder="Carbs (g)"
+      className="w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+      required
+    />
+    <input
+      type="number"
+      value={meal.fats}
+      onChange={(e) => handleMealChange(i, "fats", e.target.value)}
+      placeholder="Fats (g)"
+      className="w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+      required
+    />
+    {meals.length > 1 && (
+      <button type="button" onClick={() => removeMeal(i)} className="text-red-500 px-2">X</button>
+    )}
+  </div>
+))}
 
           <button
             type="button"
