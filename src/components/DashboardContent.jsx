@@ -297,6 +297,111 @@ export default function Dashboard() {
               ))}
             </ul>
           </div>
+          {/* Diet Modal */}
+<AnimatePresence>
+  {showDietModal && (
+    <motion.div
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-neutral-900 rounded-3xl p-6 w-11/12 max-w-2xl relative shadow-2xl"
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.8 }}
+      >
+        <h2 className="text-2xl font-bold text-white mb-4">{editDiet ? "Edit Diet" : "Create Diet"}</h2>
+        <form onSubmit={handleSaveDiet} className="flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
+          <input
+            type="text"
+            placeholder="Diet Title"
+            className="bg-neutral-800 text-white p-3 rounded-xl w-full"
+            value={dietTitle}
+            onChange={(e) => setDietTitle(e.target.value)}
+            required
+          />
+
+          {meals.map((meal, index) => (
+            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 bg-neutral-800 p-3 rounded-xl">
+              <input
+                type="text"
+                placeholder="Meal Name"
+                className="bg-neutral-700 p-2 rounded-xl text-white flex-1"
+                value={meal.name}
+                onChange={(e) => handleMealChange(index, "name", e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Calories"
+                className="bg-neutral-700 p-2 rounded-xl text-white w-24"
+                value={meal.calories}
+                onChange={(e) => handleMealChange(index, "calories", e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Protein"
+                className="bg-neutral-700 p-2 rounded-xl text-white w-20"
+                value={meal.protein}
+                onChange={(e) => handleMealChange(index, "protein", e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="Carbs"
+                className="bg-neutral-700 p-2 rounded-xl text-white w-20"
+                value={meal.carbs}
+                onChange={(e) => handleMealChange(index, "carbs", e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="Fats"
+                className="bg-neutral-700 p-2 rounded-xl text-white w-20"
+                value={meal.fats}
+                onChange={(e) => handleMealChange(index, "fats", e.target.value)}
+              />
+              <button
+                type="button"
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-xl"
+                onClick={() => removeMeal(index)}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addMeal}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl self-start"
+          >
+            + Add Meal
+          </button>
+
+          <div className="flex justify-end gap-3 mt-4">
+            <button
+              type="button"
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl"
+              onClick={() => setShowDietModal(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl ${loadingDiet ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={loadingDiet}
+            >
+              {editDiet ? "Update Diet" : "Create Diet"}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
         </div>
       </main>
     </div>
