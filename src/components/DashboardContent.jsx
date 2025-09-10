@@ -51,7 +51,6 @@ const HighCalBadge = ({ calories }) => {
 };
 
 // Calculate total macros
-// Updated calculateTotalMacros
 const calculateTotalMacros = (meals) => {
   return meals.reduce(
     (acc, m) => ({
@@ -62,7 +61,6 @@ const calculateTotalMacros = (meals) => {
     { protein: 0, carbs: 0, fats: 0 }
   );
 };
-
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -77,6 +75,12 @@ export default function Dashboard() {
   const [meals, setMeals] = useState([{ name: "", calories: 0, protein: 0, carbs: 0, fats: 0 }]);
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [collapsedDiets, setCollapsedDiets] = useState({});
+
+  // Auto-generate diet inputs
+  const [age, setAge] = useState("");
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [activityLevel, setActivityLevel] = useState("");
 
   // Load user
   useEffect(() => {
@@ -118,8 +122,7 @@ export default function Dashboard() {
   // Water reset at midnight
   useEffect(() => {
     const now = new Date();
-    const millisTillMidnight =
-      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+    const millisTillMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
     const timer = setTimeout(() => setWater(0), millisTillMidnight);
     return () => clearTimeout(timer);
   }, [water]);
@@ -127,7 +130,7 @@ export default function Dashboard() {
   // Meal handlers
   const handleMealChange = (index, field, value) => {
     const updated = [...meals];
-    updated[index][field] = field === "calories" || field === "protein" || field === "carbs" || field === "fats" ? Number(value) : value;
+    updated[index][field] = ["calories", "protein", "carbs", "fats"].includes(field) ? Number(value) : value;
     setMeals(updated);
   };
   const addMeal = () => setMeals([...meals, { name: "", calories: 0, protein: 0, carbs: 0, fats: 0 }]);
@@ -137,6 +140,10 @@ export default function Dashboard() {
     setEditDiet(null);
     setDietTitle("");
     setMeals([{ name: "", calories: 0, protein: 0, carbs: 0, fats: 0 }]);
+    setAge("");
+    setWeight("");
+    setHeight("");
+    setActivityLevel("");
     setShowDietModal(true);
   };
   const openEditModal = (diet) => {
@@ -146,6 +153,7 @@ export default function Dashboard() {
     setShowDietModal(true);
   };
 
+  // Save or create diet (manual)
   const handleSaveDiet = async (e) => {
     e.preventDefault();
     setLoadingDiet(true);
@@ -165,6 +173,37 @@ export default function Dashboard() {
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Error saving diet");
+    } finally {
+      setLoadingDiet(false);
+    }
+  };
+
+  // Auto-generate diet
+  const handleGenerateDiet = async (e) => {
+    e.preventDefault();
+    if (!age || !weight || !height || !activityLevel) {
+      return alert("Please fill all fields for auto-generation.");
+    }
+    setLoadingDiet(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return navigate("/login");
+
+      const res = await api.post("/dites/generate", {
+        title: dietTitle,
+        age: Number(age),
+        weight: Number(weight),
+        height: Number(height),
+        activityLevel,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setDiets([...diets, res.data]);
+      setShowDietModal(false);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Error generating diet");
     } finally {
       setLoadingDiet(false);
     }
@@ -306,117 +345,172 @@ export default function Dashboard() {
               ))}
             </ul>
           </div>
+
           {/* Diet Modal */}
           <AnimatePresence>
-  {showDietModal && (
-    <motion.div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-neutral-900 rounded-3xl p-6 w-11/12 max-w-2xl relative shadow-2xl"
-        initial={{ scale: 0.8 }}
-        animate={{ scale: 1 }}
-        exit={{ scale: 0.8 }}
-      >
-        <h2 className="text-2xl font-bold text-white mb-4">{editDiet ? "Edit Diet" : "Create Diet"}</h2>
-        <form onSubmit={handleSaveDiet} className="flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
-          <input
-            type="text"
-            placeholder="Diet Title"
-            className="bg-neutral-800 text-white p-3 rounded-xl w-full"
-            value={dietTitle}
-            onChange={(e) => setDietTitle(e.target.value)}
-            required
-          />
+            {showDietModal && (
+              <motion.div
+                className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="bg-neutral-900 rounded-3xl p-6 w-11/12 max-w-2xl relative shadow-2xl"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0.8 }}
+                >
+                  <h2 className="text-2xl font-bold text-white mb-4">{editDiet ? "Edit Diet" : "Create Diet"}</h2>
+                  <form className="flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
+                    <input
+                      type="text"
+                      placeholder="Diet Title"
+                      className="bg-neutral-800 text-white p-3 rounded-xl w-full"
+                      value={dietTitle}
+                      onChange={(e) => setDietTitle(e.target.value)}
+                      required
+                    />
 
-          {meals.map((meal, i) => (
-            <div key={i} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full">
-              <input
-                type="text"
-                value={meal.name}
-                onChange={(e) => handleMealChange(i, "name", e.target.value)}
-                placeholder="Meal Name"
-                className="flex-1 p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-full"
-                required
-              />
-              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                <input
-                  type="number"
-                  value={meal.calories}
-                  onChange={(e) => handleMealChange(i, "calories", e.target.value)}
-                  placeholder="Calories"
-                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-                  required
-                />
-                <input
-                  type="number"
-                  value={meal.protein}
-                  onChange={(e) => handleMealChange(i, "protein", e.target.value)}
-                  placeholder="Protein (g)"
-                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-                  required
-                />
-                <input
-                  type="number"
-                  value={meal.carbs}
-                  onChange={(e) => handleMealChange(i, "carbs", e.target.value)}
-                  placeholder="Carbs (g)"
-                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-                  required
-                />
-                <input
-                  type="number"
-                  value={meal.fats}
-                  onChange={(e) => handleMealChange(i, "fats", e.target.value)}
-                  placeholder="Fats (g)"
-                  className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
-                  required
-                />
-              </div>
-              {meals.length > 1 && (
-                <button type="button" onClick={() => removeMeal(i)} className="text-red-500 mt-1 sm:mt-0">X</button>
-              )}
-            </div>
-          ))}
+                    {/* Auto-generate inputs */}
+                    {!editDiet && (
+                      <>
+                        <div className="flex flex-wrap gap-2">
+                          <input
+                            type="number"
+                            placeholder="Age"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            className="p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-20"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Weight (kg)"
+                            value={weight}
+                            onChange={(e) => setWeight(e.target.value)}
+                            className="p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-24"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Height (cm)"
+                            value={height}
+                            onChange={(e) => setHeight(e.target.value)}
+                            className="p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-24"
+                          />
+                          <select
+                            value={activityLevel}
+                            onChange={(e) => setActivityLevel(e.target.value)}
+                            className="p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-40"
+                          >
+                            <option value="">Activity Level</option>
+                            <option value="sedentary">Sedentary</option>
+                            <option value="light">Light</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="active">Active</option>
+                          </select>
+                        </div>
+                        <button
+                          type="button"
+                          className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl"
+                          onClick={handleGenerateDiet}
+                        >
+                          {loadingDiet ? "Generating..." : "Auto-Generate Diet"}
+                        </button>
+                      </>
+                    )}
 
-          <button
-            type="button"
-            onClick={addMeal}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl self-start"
-          >
-            + Add Meal
-          </button>
+                    {/* Manual meals */}
+                    {editDiet && meals.map((meal, i) => (
+                      <div key={i} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full">
+                        <input
+                          type="text"
+                          value={meal.name}
+                          onChange={(e) => handleMealChange(i, "name", e.target.value)}
+                          placeholder="Meal Name"
+                          className="flex-1 p-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white w-full"
+                          required
+                        />
+                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                          <input
+                            type="number"
+                            value={meal.calories}
+                            onChange={(e) => handleMealChange(i, "calories", e.target.value)}
+                            placeholder="Calories"
+                            className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                            required
+                          />
+                          <input
+                            type="number"
+                            value={meal.protein}
+                            onChange={(e) => handleMealChange(i, "protein", e.target.value)}
+                            placeholder="Protein (g)"
+                            className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                            required
+                          />
+                          <input
+                            type="number"
+                            value={meal.carbs}
+                            onChange={(e) => handleMealChange(i, "carbs", e.target.value)}
+                            placeholder="Carbs (g)"
+                            className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                            required
+                          />
+                          <input
+                            type="number"
+                            value={meal.fats}
+                            onChange={(e) => handleMealChange(i, "fats", e.target.value)}
+                            placeholder="Fats (g)"
+                            className="w-full sm:w-20 p-2 rounded-xl bg-neutral-800 border border-neutral-700 text-white"
+                            required
+                          />
+                        </div>
+                        {meals.length > 1 && (
+                          <button type="button" onClick={() => removeMeal(i)} className="text-red-500 mt-1 sm:mt-0">X</button>
+                        )}
+                      </div>
+                    ))}
 
-          <div className="flex justify-end gap-3 mt-4">
-            <button
-              type="button"
-              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl"
-              onClick={() => setShowDietModal(false)}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl ${loadingDiet ? "opacity-50 cursor-not-allowed" : ""}`}
-              disabled={loadingDiet}
-            >
-              {editDiet ? "Update Diet" : "Create Diet"}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+                    {editDiet && (
+                      <button
+                        type="button"
+                        onClick={addMeal}
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl self-start"
+                      >
+                        + Add Meal
+                      </button>
+                    )}
+
+                    <div className="flex justify-end gap-3 mt-4">
+                      <button
+                        type="button"
+                        className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl"
+                        onClick={() => setShowDietModal(false)}
+                      >
+                        Cancel
+                      </button>
+                      {editDiet && (
+                        <button
+                          type="submit"
+                          className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl ${loadingDiet ? "opacity-50 cursor-not-allowed" : ""}`}
+                          onClick={handleSaveDiet}
+                          disabled={loadingDiet}
+                        >
+                          Update Diet
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </div>
       </main>
     </div>
   )
 }
+
 
 
 
