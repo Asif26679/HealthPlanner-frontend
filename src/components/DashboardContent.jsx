@@ -70,7 +70,7 @@ export default function Dashboard() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
-        const res = await api.get("/dites", { headers: { Authorization: `Bearer ${token}` } });
+        const res = await api.get("/diets", { headers: { Authorization: `Bearer ${token}` } });
         if (res.data.length > 0) setDiets(res.data);
       } catch (err) {
         console.error(err);
@@ -105,7 +105,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
 
-      const res = await api.post("/dites/generate", {
+      const res = await api.post("/diets/generate", {
         age: Number(age),
         weight: Number(weight),
         height: Number(height),
