@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Users, CheckCircle, Download, Smile } from "lucide-react";
 
-// ✅ Animated counter component
+
 function Counter({ to, duration }) {
   const [count, setCount] = useState(0);
 
