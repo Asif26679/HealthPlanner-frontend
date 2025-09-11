@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   X,
+  User,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -28,7 +29,8 @@ export default function Dashboard() {
 
   const navigate = useNavigate();
 
-  const userName = localStorage.getItem("userName") || "User";
+  // ✅ Correct username from localStorage (set in login)
+  const userName = localStorage.getItem("userName") || "Guest";
 
   // Fetch diets
   useEffect(() => {
@@ -62,13 +64,7 @@ export default function Dashboard() {
 
       const res = await api.post(
         "/diets/generate",
-        {
-          age: Number(age),
-          weight: Number(weight),
-          height: Number(height),
-          gender,
-          activityLevel,
-        },
+        { age: +age, weight: +weight, height: +height, gender, activityLevel },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -98,8 +94,7 @@ export default function Dashboard() {
 
   // Logout
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
+    localStorage.clear();
     navigate("/login");
   };
 
@@ -107,30 +102,40 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
       {/* Sidebar */}
       <div
-        className={`fixed md:relative z-40 bg-gray-800 w-64 h-full p-6 transition-transform ${
+        className={`fixed md:relative z-40 bg-gray-800 w-64 h-full p-6 transition-transform shadow-lg ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">Health Planner</h2>
-          <button
-            className="md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
+        {/* Sidebar Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-green-400">HealthPlanner</h2>
+          <button className="md:hidden" onClick={() => setSidebarOpen(false)}>
             <X size={22} />
           </button>
         </div>
 
+        {/* User Info */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className="bg-green-600 rounded-full p-2">
+            <User size={20} />
+          </div>
+          <div>
+            <p className="font-semibold">{userName}</p>
+            <p className="text-xs text-gray-400">Active Member</p>
+          </div>
+        </div>
+
+        {/* Navigation */}
         <nav className="space-y-4">
           <button
             onClick={() => navigate("/dashboard")}
-            className="block w-full text-left px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+            className="block w-full text-left px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
           >
             Dashboard
           </button>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-red-400 hover:text-red-500 px-3 py-2"
+            className="flex items-center gap-2 text-red-400 hover:text-red-500 px-4 py-2"
           >
             <LogOut size={18} /> Logout
           </button>
@@ -139,7 +144,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1 p-6 md:ml-64">
-        {/* Top bar for mobile */}
+        {/* Mobile Top Bar */}
         <div className="flex justify-between items-center mb-6 md:hidden">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <button onClick={() => setSidebarOpen(true)}>
@@ -148,11 +153,11 @@ export default function Dashboard() {
         </div>
 
         {/* Welcome + Generate */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Hello, {userName} 👋</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold">Hello, {userName} 👋</h1>
           <button
             onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-5 py-2 rounded-lg shadow-lg"
           >
             <Plus size={18} /> Generate Diet
           </button>
