@@ -103,14 +103,14 @@ export default function Dashboard() {
     navigate("/login");
   };
 
-  // Colors for meals
+  // Meal colors for gradient
   const mealColors = ["from-green-400 to-green-600", "from-orange-400 to-orange-600", "from-blue-400 to-blue-600"];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white pt-20">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
       {/* Sidebar */}
       <div
-        className={`fixed md:static top-20 left-0 h-[calc(100%-5rem)] w-64 bg-gray-800/95 backdrop-blur-lg shadow-xl transform ${
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800/95 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between`}
       >
@@ -296,6 +296,7 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 
 
