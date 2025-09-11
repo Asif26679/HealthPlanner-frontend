@@ -142,11 +142,11 @@ export default function Dashboard() {
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800/95 backdrop-blur-lg shadow-xl transform ${
+        className={`fixed md:sticky top-0 left-0 h-full w-64 bg-gray-800/95 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300 z-50 flex flex-col justify-between`}
       >
-        <div className="overflow-y-auto mt-20 md:mt-0">
+        <div className="overflow-y-auto mt-20 md:mt-0 flex-1 flex flex-col justify-between">
           {/* Generate Diet Section */}
           <div className="px-6">
             <button
