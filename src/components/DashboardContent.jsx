@@ -106,21 +106,30 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white pt-20">
       {/* Sidebar */}
       <div
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800/90 backdrop-blur-lg shadow-xl transform ${
+        className={`fixed md:static top-20 left-0 h-[calc(100%-5rem)] w-64 bg-gray-800/90 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-300 z-40`}
+        } md:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between`}
       >
         <div className="p-6 flex flex-col gap-6">
-          <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+          <button
+            onClick={() => setShowDietModal(true)}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition"
+          >
+            <Plus size={18} /> Generate Diet
+          </button>
+        </div>
+
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
             <User className="text-gray-300" />
             <span className="font-semibold">{user?.name || "User"}</span>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition"
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition w-full"
           >
             <LogOut size={18} /> Logout
           </button>
@@ -128,7 +137,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 md:ml-0 ml-0">
+      <div className="flex-1 p-6 md:ml-64">
         {/* Mobile menu button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -142,12 +151,6 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold">
             👋 Hello, <span className="text-green-400">{user?.name || "User"}</span>
           </h1>
-          <button
-            onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition"
-          >
-            <Plus size={18} /> Generate Diet
-          </button>
         </div>
 
         {/* Stats Section */}
@@ -157,14 +160,14 @@ export default function Dashboard() {
               <Flame className="text-orange-400" size={28} />
               <div>
                 <p className="text-sm text-gray-400">Total Calories</p>
-                <h2 className="text-xl font-bold">{diets[0].totalCalories || 0} kcal</h2>
+                <h2 className="text-xl font-bold">{diets[0]?.totalCalories || 0} kcal</h2>
               </div>
             </div>
             <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
               <Utensils className="text-green-400" size={28} />
               <div>
                 <p className="text-sm text-gray-400">Meals</p>
-                <h2 className="text-xl font-bold">{diets[0].meals?.length || 0}</h2>
+                <h2 className="text-xl font-bold">{diets[0]?.meals?.length || 0}</h2>
               </div>
             </div>
             <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
@@ -188,8 +191,8 @@ export default function Dashboard() {
           {diets.map((diet) => (
             <div key={diet._id} className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">{diet.title}</h2>
-                <span>Total Calories: {diet.totalCalories} kcal</span>
+                <h2 className="text-xl font-semibold">{diet.title || "Diet Plan"}</h2>
+                <span>Total Calories: {diet.totalCalories || 0} kcal</span>
               </div>
 
               {/* Meals */}
@@ -199,23 +202,30 @@ export default function Dashboard() {
                     onClick={() => setExpandedMeal(expandedMeal === idx ? null : idx)}
                     className="w-full flex justify-between items-center px-4 py-2 font-medium"
                   >
-                    <span>{meal.name}</span>
-                    <span>{meal.calories} kcal</span>
+                    <span>{meal?.name || `Meal ${idx + 1}`}</span>
+                    <span>{meal?.calories || 0} kcal</span>
                     {expandedMeal === idx ? <ChevronUp /> : <ChevronDown />}
                   </button>
 
                   {expandedMeal === idx && (
                     <div className="px-4 py-2 space-y-2 text-sm text-gray-300">
-                      {meal.foods.map((food, fIdx) => (
+                      {(meal.foods || []).map((food, fIdx) => (
                         <div key={fIdx} className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg">
-                          <span>{food.name}</span>
-                          <span>{food.calories} kcal</span>
+                          <span>{food?.name}</span>
+                          <span>{food?.calories || 0} kcal</span>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
               ))}
+
+              <button
+                onClick={() => handleDeleteDiet(diet._id)}
+                className="mt-2 flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg text-sm"
+              >
+                <Trash2 size={16} /> Delete Diet
+              </button>
             </div>
           ))}
         </div>
@@ -293,6 +303,7 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 
 
