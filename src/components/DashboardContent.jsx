@@ -111,7 +111,7 @@ export default function Dashboard() {
       <div
         className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800/90 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between`}
+        } md:translate-x-0 transition-transform duration-300 z-40`}
       >
         <div className="p-6 flex flex-col gap-6">
           <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
@@ -124,13 +124,6 @@ export default function Dashboard() {
           >
             <LogOut size={18} /> Logout
           </button>
-        </div>
-        {/* User profile at bottom */}
-        <div className="p-6 border-t border-gray-700">
-          <p className="text-gray-400 text-sm">Email:</p>
-          <p className="font-medium">{user?.email}</p>
-          <p className="text-gray-400 text-sm mt-2">Member since:</p>
-          <p className="font-medium">{user?.createdAt?.slice(0, 10) || "N/A"}</p>
         </div>
       </div>
 
@@ -192,59 +185,46 @@ export default function Dashboard() {
             </div>
           )}
 
-          {diets.map((diet) => (
-            <div key={diet._id} className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6 hover:scale-[1.02] transition">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">{diet.title}</h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-300">Total: {diet.totalCalories} kcal</span>
-                  <button
-                    onClick={() => handleDeleteDiet(diet._id)}
-                    className="text-red-500 hover:text-red-600 transition"
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                </div>
+{diets.map((diet) => (
+  <div key={diet._id} className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6">
+    <div className="flex justify-between items-center mb-4">
+      <h2 className="text-xl font-semibold">{diet.title}</h2>
+      <span>Total Calories: {diet.totalCalories} kcal</span>
+    </div>
+
+    {/* Meals */}
+    {(diet.meals || []).map((meal, idx) => (
+      <div key={idx} className="mb-4 bg-gray-700/50 rounded-lg overflow-hidden">
+        <button
+          onClick={() => setExpandedMeal(expandedMeal === idx ? null : idx)}
+          className="w-full flex justify-between items-center px-4 py-2 font-medium"
+        >
+          <span>{meal.name}</span>
+          <span>{meal.calories} kcal</span>
+        </button>
+
+        {expandedMeal === idx && (
+          <div className="px-4 py-2 space-y-2 text-sm text-gray-300">
+            {meal.foods.map((food, fIdx) => (
+              <div key={fIdx} className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg">
+                <span>{food.name}</span>
+                <span>{food.calories} kcal</span>
               </div>
+            ))}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+))}
 
-              {/* Meals */}
-              {(diet.meals || []).map((meal, idx) => (
-                <div key={idx} className="mb-4 bg-gray-700/50 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() =>
-                      setExpandedMeals((prev) => ({
-                        ...prev,
-                        [diet._id]: prev[diet._id] === idx ? null : idx
-                      }))
-                    }
-                    className="w-full flex justify-between items-center px-4 py-2 font-medium hover:bg-gray-700/80 transition"
-                  >
-                    <span>{meal.name}</span>
-                    <span>{meal.calories} kcal</span>
-                    {expandedMeals[diet._id] === idx ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                  </button>
-
-                  {expandedMeals[diet._id] === idx && (
-                    <div className="px-4 py-2 space-y-2 text-sm text-gray-300">
-                      {meal.foods.map((food, fIdx) => (
-                        <div key={fIdx} className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg">
-                          <span>{food.name}</span>
-                          <span>{food.calories} kcal</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))}
         </div>
       </div>
 
       {/* Diet Modal */}
       {showDietModal && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="bg-gray-800 p-6 rounded-xl w-96 shadow-xl animate-fadeIn">
+          <div className="bg-gray-800 p-6 rounded-xl w-96 shadow-xl">
             <h2 className="text-xl font-bold mb-4">Generate Diet</h2>
             <form onSubmit={handleGenerateDiet} className="space-y-3">
               <input
@@ -252,7 +232,7 @@ export default function Dashboard() {
                 placeholder="Age"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
                 required
               />
               <input
@@ -260,7 +240,7 @@ export default function Dashboard() {
                 placeholder="Weight (kg)"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
                 required
               />
               <input
@@ -268,13 +248,13 @@ export default function Dashboard() {
                 placeholder="Height (cm)"
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
                 required
               />
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
               >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -282,7 +262,7 @@ export default function Dashboard() {
               <select
                 value={activityLevel}
                 onChange={(e) => setActivityLevel(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
               >
                 <option value="sedentary">Sedentary</option>
                 <option value="lightly">Lightly Active</option>
@@ -294,14 +274,14 @@ export default function Dashboard() {
                 <button
                   type="submit"
                   disabled={loadingDiet}
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition"
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
                 >
                   {loadingDiet ? "Generating..." : "Generate"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDietModal(false)}
-                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition"
+                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
                 >
                   Cancel
                 </button>
