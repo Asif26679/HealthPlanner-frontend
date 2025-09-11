@@ -103,24 +103,27 @@ export default function Dashboard() {
     navigate("/login");
   };
 
+  // Colors for meals
+  const mealColors = ["from-green-400 to-green-600", "from-orange-400 to-orange-600", "from-blue-400 to-blue-600"];
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white pt-20">
       {/* Sidebar */}
       <div
-        className={`fixed md:static top-20 left-0 h-[calc(100%-5rem)] w-64 bg-gray-800/90 backdrop-blur-lg shadow-xl transform ${
+        className={`fixed md:static top-20 left-0 h-[calc(100%-5rem)] w-64 bg-gray-800/95 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between`}
       >
-        {/* Top - Generate Diet Form */}
-        <div className="p-6 overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4">Generate Daily Diet</h2>
+        {/* Generate Diet Form */}
+        <div className="p-6 overflow-y-auto space-y-5">
+          <h2 className="text-xl font-bold mb-2 text-center text-green-400">Generate Daily Diet</h2>
           <form onSubmit={handleGenerateDiet} className="space-y-3">
             <input
               type="number"
               placeholder="Age"
               value={age}
               onChange={(e) => setAge(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 rounded"
+              className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
             <input
@@ -128,7 +131,7 @@ export default function Dashboard() {
               placeholder="Weight (kg)"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 rounded"
+              className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
             <input
@@ -136,13 +139,13 @@ export default function Dashboard() {
               placeholder="Height (cm)"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 rounded"
+              className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
               required
             />
             <select
               value={gender}
               onChange={(e) => setGender(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 rounded"
+              className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
             >
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -150,7 +153,7 @@ export default function Dashboard() {
             <select
               value={activityLevel}
               onChange={(e) => setActivityLevel(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 rounded"
+              className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
             >
               <option value="sedentary">Sedentary</option>
               <option value="lightly">Lightly Active</option>
@@ -161,28 +164,28 @@ export default function Dashboard() {
             <button
               type="submit"
               disabled={loadingDiet}
-              className="bg-green-600 hover:bg-green-700 w-full px-4 py-2 rounded-lg"
+              className="bg-gradient-to-r from-green-400 to-green-600 w-full py-2 rounded-lg font-semibold shadow-lg hover:from-green-500 hover:to-green-700 transition"
             >
               {loadingDiet ? "Generating..." : "Generate"}
             </button>
           </form>
         </div>
 
-        {/* Bottom - User info & Logout */}
-        <div className="p-6">
+        {/* Bottom Sidebar - User Info */}
+        <div className="p-6 border-t border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <User className="text-gray-300" />
             <span className="font-semibold">{user?.name || "User"}</span>
           </div>
           <Link
             to="/profile"
-            className="flex items-center gap-2 mb-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg transition w-full"
+            className="flex items-center gap-2 mb-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg w-full justify-center transition"
           >
             Edit Profile
           </Link>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg transition w-full"
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg w-full justify-center transition"
           >
             <LogOut size={18} /> Logout
           </button>
@@ -207,24 +210,24 @@ export default function Dashboard() {
         {/* Stats Section */}
         {diets.length > 0 && (
           <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
-              <Flame className="text-orange-400" size={28} />
+            <div className="p-5 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-xl shadow-lg flex items-center gap-4">
+              <Flame size={28} />
               <div>
-                <p className="text-sm text-gray-400">Total Calories</p>
+                <p className="text-sm text-gray-900">Total Calories</p>
                 <h2 className="text-xl font-bold">{diets[0]?.totalCalories || 0} kcal</h2>
               </div>
             </div>
-            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
-              <Utensils className="text-green-400" size={28} />
+            <div className="p-5 bg-gradient-to-r from-green-400 to-green-600 rounded-xl shadow-lg flex items-center gap-4">
+              <Utensils size={28} />
               <div>
-                <p className="text-sm text-gray-400">Meals</p>
+                <p className="text-sm text-gray-900">Meals</p>
                 <h2 className="text-xl font-bold">{diets[0]?.meals?.length || 0}</h2>
               </div>
             </div>
-            <div className="p-5 bg-gray-800/60 rounded-xl shadow-lg flex items-center gap-4">
-              <Activity className="text-blue-400" size={28} />
+            <div className="p-5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl shadow-lg flex items-center gap-4">
+              <Activity size={28} />
               <div>
-                <p className="text-sm text-gray-400">Activity</p>
+                <p className="text-sm text-gray-900">Activity</p>
                 <h2 className="text-xl font-bold">{activityLevel}</h2>
               </div>
             </div>
@@ -240,18 +243,24 @@ export default function Dashboard() {
           )}
 
           {diets.map((diet) => (
-            <div key={diet._id} className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6">
+            <div
+              key={diet._id}
+              className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6 hover:scale-105 transform transition"
+            >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">{diet.title || "Diet Plan"}</h2>
-                <span>Total Calories: {diet.totalCalories || 0} kcal</span>
+                <span className="text-green-400 font-semibold">{diet.totalCalories || 0} kcal</span>
               </div>
 
               {/* Meals */}
               {(diet.meals || []).map((meal, idx) => (
-                <div key={idx} className="mb-4 bg-gray-700/50 rounded-lg overflow-hidden">
+                <div
+                  key={idx}
+                  className={`mb-4 rounded-lg overflow-hidden bg-gradient-to-r ${mealColors[idx % mealColors.length]} shadow-md`}
+                >
                   <button
                     onClick={() => setExpandedMeal(expandedMeal === idx ? null : idx)}
-                    className="w-full flex justify-between items-center px-4 py-2 font-medium"
+                    className="w-full flex justify-between items-center px-4 py-2 font-medium text-gray-900"
                   >
                     <span>{meal?.name || `Meal ${idx + 1}`}</span>
                     <span>{meal?.calories || 0} kcal</span>
@@ -259,9 +268,12 @@ export default function Dashboard() {
                   </button>
 
                   {expandedMeal === idx && (
-                    <div className="px-4 py-2 space-y-2 text-sm text-gray-300">
+                    <div className="px-4 py-2 space-y-2 text-gray-900">
                       {(meal.foods || []).map((food, fIdx) => (
-                        <div key={fIdx} className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg">
+                        <div
+                          key={fIdx}
+                          className="flex justify-between bg-gray-100/20 px-3 py-2 rounded-lg"
+                        >
                           <span>{food?.name}</span>
                           <span>{food?.calories || 0} kcal</span>
                         </div>
