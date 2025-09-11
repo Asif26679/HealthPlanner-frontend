@@ -18,20 +18,13 @@ import {
 } from "lucide-react";
 
 export default function Dashboard() {
-  const [diets, setDiets] = useState([]);
-  const [showDietModal, setShowDietModal] = useState(false);
-  const [loadingDiet, setLoadingDiet] = useState(false);
-  const [expandedMeal, setExpandedMeal] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const [age, setAge] = useState("");
-  const [weight, setWeight] = useState("");
-  const [height, setHeight] = useState("");
-  const [gender, setGender] = useState("male");
-  const [activityLevel, setActivityLevel] = useState("sedentary");
-
+  const { logout } = useAuth();
   const navigate = useNavigate();
-  const { user } = useAuth();
+
+  const [diets, setDiets] = useState([]);
+  const [expandedDiet, setExpandedDiet] = useState(null);
+  const [expandedMeal, setExpandedMeal] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Fetch diets
   useEffect(() => {
@@ -43,6 +36,8 @@ export default function Dashboard() {
         const res = await api.get("/diets", {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        console.log("Diet API Response:", res.data); // 🔍 Debug
         setDiets(res.data || []);
       } catch (err) {
         console.error("Error fetching diets:", err);
@@ -51,259 +46,176 @@ export default function Dashboard() {
     fetchData();
   }, [navigate]);
 
-  // Generate new diet
-  const handleGenerateDiet = async (e) => {
-    e.preventDefault();
-    if (!age || !weight || !height || !activityLevel) {
-      return alert("Please fill all fields");
-    }
-    setLoadingDiet(true);
+  // Generate diet
+  const generateDiet = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return navigate("/login");
-
-      // Delete old diets
-      for (let d of diets) {
-        await api.delete(`/diets/${d._id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
-
       const res = await api.post(
         "/diets/generate",
-        { age: Number(age), weight: Number(weight), height: Number(height), gender, activityLevel },
+        {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setDiets([res.data]);
-      setShowDietModal(false);
+      setDiets((prev) => [res.data, ...prev]);
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Error generating diet");
-    } finally {
-      setLoadingDiet(false);
+      console.error("Error generating diet:", err);
     }
   };
 
   // Delete diet
-  const handleDeleteDiet = async (id) => {
-    if (!window.confirm("Delete this diet?")) return;
+  const deleteDiet = async (id) => {
     try {
       const token = localStorage.getItem("token");
       await api.delete(`/diets/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setDiets(diets.filter((d) => d._id !== id));
+      setDiets((prev) => prev.filter((diet) => diet._id !== id));
     } catch (err) {
-      console.error(err);
+      console.error("Error deleting diet:", err);
     }
   };
 
-  // Logout
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
-      {/* Sidebar */}
-      <div
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800/90 backdrop-blur-lg shadow-xl transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-300 z-40`}
-      >
-        <div className="p-6 flex flex-col gap-6">
-          <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
-            <User className="text-gray-300" />
-            <span className="font-semibold">{user?.name || "User"}</span>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white">
+      {/* Navbar */}
+      <nav className="flex items-center justify-between p-4 bg-gray-900 shadow-lg sticky top-0 z-50">
+        <h1 className="text-xl font-bold flex items-center gap-2">
+          <Utensils className="w-6 h-6 text-green-400" />
+          HealthPlanner
+        </h1>
+
+        {/* Desktop menu */}
+        <div className="hidden md:flex items-center gap-4">
           <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition"
+            onClick={logout}
+            className="flex items-center gap-2 bg-red-600 px-3 py-2 rounded-lg hover:bg-red-700"
           >
             <LogOut size={18} /> Logout
           </button>
         </div>
-      </div>
+
+        {/* Mobile menu toggle */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden p-2 bg-gray-800 rounded-lg"
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </button>
+      </nav>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-gray-900 p-4 flex flex-col gap-3 shadow-lg">
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 bg-red-600 px-3 py-2 rounded-lg hover:bg-red-700"
+          >
+            <LogOut size={18} /> Logout
+          </button>
+        </div>
+      )}
 
       {/* Main Content */}
-      <div className="flex-1 p-6 md:ml-0 ml-0">
-        {/* Mobile menu button */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden mb-4 p-2 bg-gray-800 rounded-lg"
-        >
-          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-          <h1 className="text-3xl font-bold">
-            👋 Hello, <span className="text-green-400">{user?.name || "User"}</span>
-          </h1>
+      <main className="p-6 max-w-6xl mx-auto">
+        {/* Generate button */}
+        <div className="flex justify-end mb-6">
           <button
-            onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition"
+            onClick={generateDiet}
+            className="flex items-center gap-2 bg-green-600 px-4 py-2 rounded-lg shadow-md hover:bg-green-700"
           >
             <Plus size={18} /> Generate Diet
           </button>
         </div>
 
-        {/* Stats Section */}
-        {diets.length > 0 && (
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
-              <Flame className="text-orange-400" size={28} />
-              <div>
-                <p className="text-sm text-gray-400">Total Calories</p>
-                <h2 className="text-xl font-bold">{diets[0]?.totalCalories || 0} kcal</h2>
-              </div>
-            </div>
-            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
-              <Utensils className="text-green-400" size={28} />
-              <div>
-                <p className="text-sm text-gray-400">Meals</p>
-                <h2 className="text-xl font-bold">{diets[0]?.meals?.length || 0}</h2>
-              </div>
-            </div>
-            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
-              <Activity className="text-blue-400" size={28} />
-              <div>
-                <p className="text-sm text-gray-400">Activity</p>
-                <h2 className="text-xl font-bold">{activityLevel}</h2>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Diet List */}
+        {/* Diets list */}
         <div className="grid md:grid-cols-2 gap-6">
-          {diets.length === 0 && (
-            <div className="col-span-full text-center text-gray-400">
-              No diets yet. Click <b>Generate Diet</b> to start!
-            </div>
-          )}
-
-          {diets.map((diet) => (
+          {(diets || []).map((diet, dietIdx) => (
             <div
-              key={diet._id}
-              className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6"
+              key={diet._id || dietIdx}
+              className="bg-gray-800/70 p-4 rounded-2xl shadow-lg hover:shadow-xl transition"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">{diet.title || "My Diet Plan"}</h2>
-                <button
-                  onClick={() => handleDeleteDiet(diet._id)}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  <Trash2 size={20} />
-                </button>
-              </div>
-              <span className="text-gray-400">Total Calories: {diet.totalCalories || 0} kcal</span>
+              {/* Diet header */}
+              <button
+                onClick={() =>
+                  setExpandedDiet(expandedDiet === dietIdx ? null : dietIdx)
+                }
+                className="w-full flex justify-between items-center font-semibold text-lg"
+              >
+                <span className="flex items-center gap-2">
+                  <Flame className="text-orange-400" />
+                  {diet?.title || `Diet ${dietIdx + 1}`}
+                </span>
+                {expandedDiet === dietIdx ? <ChevronUp /> : <ChevronDown />}
+              </button>
 
-              {/* Meals */}
-              {(diet.meals || []).map((meal, idx) => (
-                <div key={idx} className="mt-4 bg-gray-700/50 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setExpandedMeal(expandedMeal === idx ? null : idx)}
-                    className="w-full flex justify-between items-center px-4 py-2 font-medium hover:bg-gray-700"
-                  >
-                    <span>{meal?.name || "Meal"}</span>
-                    <div className="flex items-center gap-2">
-                      <span>{meal?.calories || 0} kcal</span>
-                      {expandedMeal === idx ? <ChevronUp /> : <ChevronDown />}
-                    </div>
-                  </button>
+              {/* Diet content */}
+              {expandedDiet === dietIdx && (
+                <div className="mt-4 space-y-3">
+                  <div className="flex justify-between text-sm text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <Activity size={14} /> {diet?.calories || 0} kcal
+                    </span>
+                    <button
+                      onClick={() => deleteDiet(diet._id)}
+                      className="text-red-500 hover:text-red-700 flex items-center gap-1"
+                    >
+                      <Trash2 size={16} /> Delete
+                    </button>
+                  </div>
 
-                  {expandedMeal === idx && (
-                    <div className="px-4 py-2 space-y-2 text-sm text-gray-300">
-                      {(meal?.foods || []).map((food, fIdx) => (
-                        <div
-                          key={fIdx}
-                          className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg"
+                  {/* Meals */}
+                  {(diet?.meals ?? []).length > 0 ? (
+                    (diet.meals || []).map((meal, mealIdx) => (
+                      <div
+                        key={mealIdx}
+                        className="mt-4 bg-gray-700/50 rounded-lg overflow-hidden"
+                      >
+                        <button
+                          onClick={() =>
+                            setExpandedMeal(
+                              expandedMeal === `${dietIdx}-${mealIdx}`
+                                ? null
+                                : `${dietIdx}-${mealIdx}`
+                            )
+                          }
+                          className="w-full flex justify-between items-center px-4 py-2 font-medium hover:bg-gray-700"
                         >
-                          <span>{food?.name || "Food Item"}</span>
-                          <span>{food?.calories || 0} kcal</span>
-                        </div>
-                      ))}
-                    </div>
+                          <span>{meal?.name || `Meal ${mealIdx + 1}`}</span>
+                          <div className="flex items-center gap-2">
+                            <span>{meal?.calories || 0} kcal</span>
+                            {expandedMeal === `${dietIdx}-${mealIdx}` ? (
+                              <ChevronUp />
+                            ) : (
+                              <ChevronDown />
+                            )}
+                          </div>
+                        </button>
+
+                        {expandedMeal === `${dietIdx}-${mealIdx}` && (
+                          <div className="px-4 py-2 space-y-2 text-sm text-gray-300">
+                            {(meal?.foods || []).map((food, foodIdx) => (
+                              <div
+                                key={foodIdx}
+                                className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg"
+                              >
+                                <span>{food?.name || "Food Item"}</span>
+                                <span>{food?.calories || 0} kcal</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-400 text-sm mt-2">
+                      No meals found for this diet.
+                    </p>
                   )}
                 </div>
-              ))}
+              )}
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Diet Modal */}
-      {showDietModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="bg-gray-800 p-6 rounded-xl w-96 shadow-xl">
-            <h2 className="text-xl font-bold mb-4">Generate Diet</h2>
-            <form onSubmit={handleGenerateDiet} className="space-y-3">
-              <input
-                type="number"
-                placeholder="Age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Weight (kg)"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Height (cm)"
-                value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-                required
-              />
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-              <select
-                value={activityLevel}
-                onChange={(e) => setActivityLevel(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-              >
-                <option value="sedentary">Sedentary</option>
-                <option value="lightly">Lightly Active</option>
-                <option value="moderate">Moderate</option>
-                <option value="active">Active</option>
-                <option value="very">Very Active</option>
-              </select>
-              <div className="flex justify-between mt-4">
-                <button
-                  type="submit"
-                  disabled={loadingDiet}
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
-                >
-                  {loadingDiet ? "Generating..." : "Generate"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowDietModal(false)}
-                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      </main>
     </div>
   );
 }
