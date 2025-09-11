@@ -1,5 +1,4 @@
-// Dashboard.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import api from "../utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -32,6 +31,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const sidebarRef = useRef(null);
+
   // Fetch diets
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +50,21 @@ export default function Dashboard() {
     };
     fetchData();
   }, [navigate]);
+
+  // Click outside to close sidebar on mobile
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+        setSidebarOpen(false);
+      }
+    };
+    if (sidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [sidebarOpen]);
 
   // Generate new diet
   const handleGenerateDiet = async (e) => {
@@ -103,16 +119,16 @@ export default function Dashboard() {
     navigate("/login");
   };
 
-  // Colors for meals
   const mealColors = ["from-green-400 to-green-600", "from-orange-400 to-orange-600", "from-blue-400 to-blue-600"];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white pt-20">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white pt-20 relative">
       {/* Sidebar */}
       <div
+        ref={sidebarRef}
         className={`fixed md:static top-20 left-0 h-[calc(100%-5rem)] w-64 bg-gray-800/95 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between`}
+        } md:translate-x-0 transition-transform duration-300 z-50 flex flex-col justify-between`}
       >
         {/* Generate Diet Form */}
         <div className="p-6 overflow-y-auto space-y-5">
@@ -197,7 +213,7 @@ export default function Dashboard() {
         {/* Mobile menu button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden mb-4 p-2 bg-gray-800 rounded-lg"
+          className="md:hidden mb-4 p-2 bg-gray-800 rounded-lg shadow"
         >
           {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -252,7 +268,6 @@ export default function Dashboard() {
                 <span className="text-green-400 font-semibold">{diet.totalCalories || 0} kcal</span>
               </div>
 
-              {/* Meals */}
               {(diet.meals || []).map((meal, idx) => (
                 <div
                   key={idx}
