@@ -2,12 +2,21 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronUp, Trash2, Plus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Trash2,
+  Plus,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 
 export default function Dashboard() {
   const [diets, setDiets] = useState([]);
   const [showDietModal, setShowDietModal] = useState(false);
   const [loadingDiet, setLoadingDiet] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
@@ -18,6 +27,8 @@ export default function Dashboard() {
   const [expandedMeal, setExpandedMeal] = useState(null);
 
   const navigate = useNavigate();
+
+  const userName = localStorage.getItem("userName") || "User";
 
   // Fetch diets
   useEffect(() => {
@@ -85,88 +96,139 @@ export default function Dashboard() {
     }
   };
 
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    navigate("/login");
+  };
+
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-900 to-black min-h-screen text-white">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">My Diet Dashboard</h1>
-        <button
-          onClick={() => setShowDietModal(true)}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg"
-        >
-          <Plus size={18} /> Generate Diet
-        </button>
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+      {/* Sidebar */}
+      <div
+        className={`fixed md:relative z-40 bg-gray-800 w-64 h-full p-6 transition-transform ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold">Health Planner</h2>
+          <button
+            className="md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <X size={22} />
+          </button>
+        </div>
+
+        <nav className="space-y-4">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="block w-full text-left px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-red-400 hover:text-red-500 px-3 py-2"
+          >
+            <LogOut size={18} /> Logout
+          </button>
+        </nav>
       </div>
 
-      {/* Diet List */}
-      <div className="space-y-6">
-        {diets.length === 0 && (
-          <p className="text-gray-400 text-center">
-            No diets yet. Click <b>Generate Diet</b> to start!
-          </p>
-        )}
+      {/* Main Content */}
+      <div className="flex-1 p-6 md:ml-64">
+        {/* Top bar for mobile */}
+        <div className="flex justify-between items-center mb-6 md:hidden">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <button onClick={() => setSidebarOpen(true)}>
+            <Menu size={24} />
+          </button>
+        </div>
 
-        {diets.map((diet) => (
-          <div
-            key={diet._id}
-            className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5"
+        {/* Welcome + Generate */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Hello, {userName} 👋</h1>
+          <button
+            onClick={() => setShowDietModal(true)}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg"
           >
-            {/* Header */}
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h2 className="text-xl font-semibold">{diet.title}</h2>
-                <p className="text-sm text-gray-400">
-                  Total Calories: {diet.totalCalories || 0}
-                </p>
-              </div>
-              <button
-                onClick={() => handleDeleteDiet(diet._id)}
-                className="text-red-500 hover:text-red-600"
-              >
-                <Trash2 size={20} />
-              </button>
-            </div>
+            <Plus size={18} /> Generate Diet
+          </button>
+        </div>
 
-            {/* Meals Accordion */}
-            <div className="space-y-3">
-              {(diet.meals || []).map((meal, idx) => (
-                <div key={idx} className="bg-gray-700 rounded-lg">
-                  <button
-                    onClick={() =>
-                      setExpandedMeal(expandedMeal === idx ? null : idx)
-                    }
-                    className="w-full flex justify-between items-center px-4 py-3"
-                  >
-                    <span className="font-medium">{meal.name}</span>
-                    <span className="text-sm text-gray-300">
-                      {meal.calories} kcal
-                    </span>
-                    {expandedMeal === idx ? (
-                      <ChevronUp size={18} />
-                    ) : (
-                      <ChevronDown size={18} />
-                    )}
-                  </button>
+        {/* Diet List */}
+        <div className="space-y-6">
+          {diets.length === 0 && (
+            <p className="text-gray-400 text-center">
+              No diets yet. Click <b>Generate Diet</b> to start!
+            </p>
+          )}
 
-                  {expandedMeal === idx && (
-                    <div className="px-4 pb-3 space-y-2 text-sm text-gray-300">
-                      <p>
-                        Protein: {meal.protein}g | Carbs: {meal.carbs}g | Fats:{" "}
-                        {meal.fats}g
-                      </p>
-                      <ul className="list-disc ml-5 space-y-1">
-                        {(meal.foods || []).map((food, fIdx) => (
-                          <li key={fIdx}>
-                            {food.name} ({food.calories} kcal)
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+          {diets.map((diet) => (
+            <div
+              key={diet._id}
+              className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-xl font-semibold">{diet.title}</h2>
+                  <p className="text-sm text-gray-400">
+                    Total Calories: {diet.totalCalories || 0}
+                  </p>
                 </div>
-              ))}
+                <button
+                  onClick={() => handleDeleteDiet(diet._id)}
+                  className="text-red-500 hover:text-red-600"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+
+              {/* Meals Accordion */}
+              <div className="space-y-3">
+                {(diet.meals || []).map((meal, idx) => (
+                  <div key={idx} className="bg-gray-700 rounded-lg">
+                    <button
+                      onClick={() =>
+                        setExpandedMeal(expandedMeal === idx ? null : idx)
+                      }
+                      className="w-full flex justify-between items-center px-4 py-3"
+                    >
+                      <span className="font-medium">{meal.name}</span>
+                      <span className="text-sm text-gray-300">
+                        {meal.calories} kcal
+                      </span>
+                      {expandedMeal === idx ? (
+                        <ChevronUp size={18} />
+                      ) : (
+                        <ChevronDown size={18} />
+                      )}
+                    </button>
+
+                    {expandedMeal === idx && (
+                      <div className="px-4 pb-3 space-y-2 text-sm text-gray-300">
+                        <p>
+                          Protein: {meal.protein}g | Carbs: {meal.carbs}g | Fats:{" "}
+                          {meal.fats}g
+                        </p>
+                        <ul className="list-disc ml-5 space-y-1">
+                          {(meal.foods || []).map((food, fIdx) => (
+                            <li key={fIdx}>
+                              {food.name} ({food.calories} kcal)
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Diet Modal */}
