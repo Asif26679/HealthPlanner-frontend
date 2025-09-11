@@ -12,6 +12,7 @@ import {
   Utensils,
   Flame,
   Activity,
+  Trash2,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -103,7 +104,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-950 text-white">
-      {/* Sidebar (mobile drawer + desktop fixed) */}
+      {/* Sidebar */}
       <div
         className={`fixed md:static top-0 left-0 h-full w-64 bg-gradient-to-b from-gray-800 to-black border-r border-gray-700 transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -193,13 +194,23 @@ export default function Dashboard() {
               key={diet._id}
               className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-4 md:p-5 hover:shadow-xl transition"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
+              {/* Card Header */}
+              <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold">{diet.title}</h2>
-                <span className="text-sm text-gray-300">
-                  {diet.totalCalories} kcal
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-300">
+                    {diet.totalCalories} kcal
+                  </span>
+                  <button
+                    onClick={() => handleDeleteDiet(diet._id)}
+                    className="p-2 rounded-lg bg-red-600 hover:bg-red-700 transition"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
 
+              {/* Meals */}
               {(diet.meals || []).map((meal, idx) => (
                 <div key={idx} className="mb-3 bg-gray-700/50 rounded-lg overflow-hidden">
                   <button
