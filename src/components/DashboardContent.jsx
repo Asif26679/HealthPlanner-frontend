@@ -12,13 +12,12 @@ import {
   X,
   LogOut,
   User,
-  Utensils,
   Flame,
   Activity,
 } from "lucide-react";
 
 export default function Dashboard() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const [diets, setDiets] = useState([]);
@@ -73,20 +72,18 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-950 text-white">
+    <div className="flex h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white">
       {/* Sidebar - Desktop */}
-      <aside className="hidden md:flex flex-col w-64 bg-gray-900 border-r border-gray-800 p-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2 mb-8">
-          <Utensils className="w-7 h-7 text-green-400" /> HealthPlanner
-        </h1>
+      <aside className="hidden md:flex flex-col w-60 bg-gray-900/80 border-r border-gray-800 backdrop-blur-xl p-6">
+        <div className="flex items-center gap-3 p-3 bg-gray-800/60 rounded-xl mb-6">
+          <User className="text-gray-300" />
+          <span className="font-semibold">{user?.name || "User"}</span>
+        </div>
 
-        <nav className="flex flex-col gap-4 flex-1">
-          <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800">
-            <User size={18} /> Profile
-          </button>
+        <nav className="flex flex-col gap-3 flex-1">
           <button
             onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-600/80"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-600/80 transition"
           >
             <LogOut size={18} /> Logout
           </button>
@@ -95,9 +92,7 @@ export default function Dashboard() {
 
       {/* Mobile Topbar */}
       <div className="md:hidden fixed top-0 left-0 w-full flex justify-between items-center bg-gray-900 px-4 py-3 z-50 shadow-md">
-        <h1 className="text-lg font-bold flex items-center gap-2">
-          <Utensils className="w-6 h-6 text-green-400" /> HealthPlanner
-        </h1>
+        <span className="font-semibold">{user?.name || "User"}</span>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 bg-gray-800 rounded-lg"
@@ -106,7 +101,7 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar */}
       {sidebarOpen && (
         <div className="md:hidden fixed top-0 left-0 w-64 h-full bg-gray-900 p-6 shadow-lg z-40">
           <button
@@ -115,36 +110,38 @@ export default function Dashboard() {
           >
             <X />
           </button>
-          <nav className="mt-10 flex flex-col gap-4">
-            <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800">
-              <User size={18} /> Profile
-            </button>
+          <div className="mt-10 flex flex-col gap-4">
             <button
               onClick={logout}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-600/80"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-600/80 transition"
             >
               <LogOut size={18} /> Logout
             </button>
-          </nav>
+          </div>
         </div>
       )}
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-6 mt-12 md:mt-0">
-        <div className="flex justify-end mb-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <h1 className="text-3xl font-bold">
+            👋 Welcome, <span className="text-green-400">{user?.name || "User"}</span>
+          </h1>
           <button
             onClick={generateDiet}
-            className="flex items-center gap-2 bg-green-600 px-4 py-2 rounded-lg shadow-md hover:bg-green-700"
+            className="flex items-center gap-2 bg-green-600 px-4 py-2 rounded-lg shadow-lg hover:bg-green-700 transition"
           >
             <Plus size={18} /> Generate Diet
           </button>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Diets Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(diets || []).map((diet, dietIdx) => (
             <div
               key={diet._id || dietIdx}
-              className="bg-gray-800/70 p-5 rounded-2xl shadow-lg hover:shadow-xl transition"
+              className="bg-gray-900/70 border border-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition p-5 backdrop-blur-lg"
             >
               {/* Diet Header */}
               <button
@@ -160,7 +157,7 @@ export default function Dashboard() {
                 {expandedDiet === dietIdx ? <ChevronUp /> : <ChevronDown />}
               </button>
 
-              {/* Diet Content */}
+              {/* Diet Details */}
               {expandedDiet === dietIdx && (
                 <div className="mt-4 space-y-3">
                   <div className="flex justify-between text-sm text-gray-400">
@@ -180,7 +177,7 @@ export default function Dashboard() {
                     (diet.meals || []).map((meal, mealIdx) => (
                       <div
                         key={mealIdx}
-                        className="mt-4 bg-gray-700/50 rounded-lg overflow-hidden"
+                        className="mt-4 bg-gray-800/50 rounded-lg overflow-hidden"
                       >
                         <button
                           onClick={() =>
@@ -190,7 +187,7 @@ export default function Dashboard() {
                                 : `${dietIdx}-${mealIdx}`
                             )
                           }
-                          className="w-full flex justify-between items-center px-4 py-2 font-medium hover:bg-gray-700"
+                          className="w-full flex justify-between items-center px-4 py-2 font-medium hover:bg-gray-700 transition"
                         >
                           <span>{meal?.name || `Meal ${mealIdx + 1}`}</span>
                           <div className="flex items-center gap-2">
@@ -208,7 +205,7 @@ export default function Dashboard() {
                             {(meal?.foods || []).map((food, foodIdx) => (
                               <div
                                 key={foodIdx}
-                                className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg"
+                                className="flex justify-between bg-gray-900/40 px-3 py-2 rounded-lg"
                               >
                                 <span>{food?.name || "Food Item"}</span>
                                 <span>{food?.calories || 0} kcal</span>
@@ -232,6 +229,7 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 
 
