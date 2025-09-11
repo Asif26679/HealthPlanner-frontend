@@ -209,42 +209,51 @@ export default function Dashboard() {
               </div>
 
               {/* Meals Accordion */}
-              <div className="space-y-3">
-                {(diet.meals || []).map((meal, idx) => (
-                  <div key={idx} className="bg-gray-700/50 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() =>
-                        setExpandedMeal(expandedMeal === idx ? null : idx)
-                      }
-                      className="w-full flex justify-between items-center px-4 py-3"
-                    >
-                      <span className="font-medium">{meal.name}</span>
-                      <span className="text-sm text-gray-300">
-                        {meal.foods?.reduce((a, f) => a + f.calories, 0) || 0} kcal
-                      </span>
-                      {expandedMeal === idx ? (
-                        <ChevronUp size={18} />
-                      ) : (
-                        <ChevronDown size={18} />
-                      )}
-                    </button>
+              {/* Meals Accordion */}
+<div className="space-y-3">
+  {(diets[0]?.meals || []).map((meal, idx) => (
+    <div key={idx} className="bg-gray-700/50 rounded-lg overflow-hidden">
+      <button
+        onClick={() =>
+          setExpandedMeal(expandedMeal === idx ? null : idx)
+        }
+        className="w-full flex justify-between items-center px-4 py-3"
+      >
+        <span className="font-medium">{meal.name}</span>
+        <span className="text-sm text-gray-300">
+          {meal.calories} kcal
+        </span>
+        {expandedMeal === idx ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+      </button>
 
-                    {expandedMeal === idx && (
-                      <div className="px-4 pb-3 space-y-2 text-sm text-gray-300 animate-fadeIn">
-                        {meal.foods?.map((food, fIdx) => (
-                          <div
-                            key={fIdx}
-                            className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg"
-                          >
-                            <span>{food.name}</span>
-                            <span>{food.calories} kcal</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+      {expandedMeal === idx && (
+        <div className="px-4 pb-3 space-y-2 text-sm text-gray-300 animate-fadeIn">
+          {/* Meal totals */}
+          <div className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg font-semibold">
+            <span>Total</span>
+            <span>
+              {meal.calories} kcal | P: {meal.protein}g | C: {meal.carbs}g | F: {meal.fats}g
+            </span>
+          </div>
+
+          {/* Individual foods */}
+          {meal.foods?.map((food, fIdx) => (
+            <div
+              key={fIdx}
+              className="flex justify-between bg-gray-800/20 px-3 py-2 rounded-lg"
+            >
+              <span>{food.name}</span>
+              <span>
+                {food.calories} kcal | P: {food.protein}g | C: {food.carbs}g | F: {food.fats}g
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
             </div>
           ))}
         </div>
