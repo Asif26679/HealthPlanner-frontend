@@ -28,9 +28,7 @@ export default function Dashboard() {
   const [expandedMeal, setExpandedMeal] = useState(null);
 
   const navigate = useNavigate();
-
-  // ✅ Correct username from localStorage (set in login)
-  const userName = localStorage.getItem("userName") || "Guest";
+  const userName = localStorage.getItem("username") || "Guest";
 
   // Fetch diets
   useEffect(() => {
@@ -51,7 +49,7 @@ export default function Dashboard() {
     fetchDiets();
   }, [navigate]);
 
-  // Generate diet
+  // Generate diet (delete old → save new)
   const handleGenerateDiet = async (e) => {
     e.preventDefault();
     if (!age || !weight || !height || !activityLevel) {
@@ -62,13 +60,20 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
 
+      // ✅ delete previous diets before creating new one
+      if (diets.length > 0) {
+        await api.delete(`/diets/${diets[0]._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+
       const res = await api.post(
         "/diets/generate",
         { age: +age, weight: +weight, height: +height, gender, activityLevel },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setDiets([...diets, res.data]);
+      setDiets([res.data]); // ✅ replace instead of appending
       setShowDietModal(false);
     } catch (err) {
       console.error(err);
@@ -78,7 +83,7 @@ export default function Dashboard() {
     }
   };
 
-  // Delete diet
+  // Delete diet manually
   const handleDeleteDiet = async (id) => {
     if (!window.confirm("Delete this diet?")) return;
     try {
@@ -86,7 +91,7 @@ export default function Dashboard() {
       await api.delete(`/diets/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setDiets(diets.filter((d) => d._id !== id));
+      setDiets([]);
     } catch (err) {
       console.error(err);
     }
@@ -153,86 +158,86 @@ export default function Dashboard() {
         </div>
 
         {/* Welcome + Generate */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Hello, {userName} 👋</h1>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+          <h1 className="text-3xl font-bold">👋 Hello, {userName}</h1>
           <button
             onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-5 py-2 rounded-lg shadow-lg"
+            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 px-5 py-2 rounded-lg shadow-lg w-full md:w-auto"
           >
-            <Plus size={18} /> Generate Diet
+            <Plus size={18} /> Generate New Diet
           </button>
         </div>
 
-        {/* Diet List */}
+        {/* Diet Section */}
         <div className="space-y-6">
-          {diets.length === 0 && (
+          {diets.length === 0 ? (
             <p className="text-gray-400 text-center">
-              No diets yet. Click <b>Generate Diet</b> to start!
+              No diet yet. Click <b>Generate New Diet</b> to start!
             </p>
-          )}
-
-          {diets.map((diet) => (
-            <div
-              key={diet._id}
-              className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5"
-            >
-              {/* Header */}
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h2 className="text-xl font-semibold">{diet.title}</h2>
-                  <p className="text-sm text-gray-400">
-                    Total Calories: {diet.totalCalories || 0}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleDeleteDiet(diet._id)}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  <Trash2 size={20} />
-                </button>
-              </div>
-
-              {/* Meals Accordion */}
-              <div className="space-y-3">
-                {(diet.meals || []).map((meal, idx) => (
-                  <div key={idx} className="bg-gray-700 rounded-lg">
-                    <button
-                      onClick={() =>
-                        setExpandedMeal(expandedMeal === idx ? null : idx)
-                      }
-                      className="w-full flex justify-between items-center px-4 py-3"
-                    >
-                      <span className="font-medium">{meal.name}</span>
-                      <span className="text-sm text-gray-300">
-                        {meal.calories} kcal
-                      </span>
-                      {expandedMeal === idx ? (
-                        <ChevronUp size={18} />
-                      ) : (
-                        <ChevronDown size={18} />
-                      )}
-                    </button>
-
-                    {expandedMeal === idx && (
-                      <div className="px-4 pb-3 space-y-2 text-sm text-gray-300">
-                        <p>
-                          Protein: {meal.protein}g | Carbs: {meal.carbs}g | Fats:{" "}
-                          {meal.fats}g
-                        </p>
-                        <ul className="list-disc ml-5 space-y-1">
-                          {(meal.foods || []).map((food, fIdx) => (
-                            <li key={fIdx}>
-                              {food.name} ({food.calories} kcal)
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+          ) : (
+            diets.map((diet) => (
+              <div
+                key={diet._id}
+                className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5"
+              >
+                {/* Header */}
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h2 className="text-xl font-semibold">{diet.title}</h2>
+                    <p className="text-sm text-gray-400">
+                      Total Calories: {diet.totalCalories || 0}
+                    </p>
                   </div>
-                ))}
+                  <button
+                    onClick={() => handleDeleteDiet(diet._id)}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+
+                {/* Meals Accordion */}
+                <div className="space-y-3">
+                  {(diet.meals || []).map((meal, idx) => (
+                    <div key={idx} className="bg-gray-700 rounded-lg">
+                      <button
+                        onClick={() =>
+                          setExpandedMeal(expandedMeal === idx ? null : idx)
+                        }
+                        className="w-full flex justify-between items-center px-4 py-3"
+                      >
+                        <span className="font-medium">{meal.name}</span>
+                        <span className="text-sm text-gray-300">
+                          {meal.calories} kcal
+                        </span>
+                        {expandedMeal === idx ? (
+                          <ChevronUp size={18} />
+                        ) : (
+                          <ChevronDown size={18} />
+                        )}
+                      </button>
+
+                      {expandedMeal === idx && (
+                        <div className="px-4 pb-3 space-y-2 text-sm text-gray-300">
+                          <p>
+                            Protein: {meal.protein}g | Carbs: {meal.carbs}g |
+                            Fats: {meal.fats}g
+                          </p>
+                          <ul className="list-disc ml-5 space-y-1">
+                            {(meal.foods || []).map((food, fIdx) => (
+                              <li key={fIdx}>
+                                {food.name} ({food.calories} kcal)
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -240,7 +245,7 @@ export default function Dashboard() {
       {showDietModal && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
           <div className="bg-gray-800 p-6 rounded-xl w-96 shadow-xl">
-            <h2 className="text-xl font-bold mb-4">Generate Diet</h2>
+            <h2 className="text-xl font-bold mb-4">Generate New Diet</h2>
             <form onSubmit={handleGenerateDiet} className="space-y-3">
               <input
                 type="number"
