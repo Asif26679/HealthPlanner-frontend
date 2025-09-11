@@ -1,113 +1,65 @@
+// Dashboard.jsx
 import React, { useEffect, useState } from "react";
-import {
-  Salad,
-  Dumbbell,
-  Droplets,
-  LayoutDashboard,
-  User,
-  LogOut,
-  Menu,
-} from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import api from "../utils/api";
-
-// Animated Number
-const AnimatedNumber = ({ value, duration = 1.2, className }) => {
-  const [displayValue, setDisplayValue] = useState(0);
-  useEffect(() => {
-    const diff = value - displayValue;
-    if (diff === 0) return;
-    const stepTime = duration * 1000 / Math.abs(diff);
-    let current = displayValue;
-    const timer = setInterval(() => {
-      current += diff > 0 ? 1 : -1;
-      setDisplayValue(current);
-      if ((diff > 0 && current >= value) || (diff < 0 && current <= value)) {
-        setDisplayValue(value);
-        clearInterval(timer);
-      }
-    }, stepTime);
-    return () => clearInterval(timer);
-  }, [value, duration, displayValue]);
-  return <span className={className}>{displayValue}</span>;
-};
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const [diets, setDiets] = useState([]);
-  const [workouts, setWorkouts] = useState([]);
-  const [water, setWater] = useState(1200);
+  const [showDietModal, setShowDietModal] = useState(false);
   const [loadingDiet, setLoadingDiet] = useState(false);
 
-  // User load
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (!storedUser) navigate("/login");
-    else setUser(storedUser);
-  }, [navigate]);
+  const [age, setAge] = useState("");
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [gender, setGender] = useState("male");
+  const [activityLevel, setActivityLevel] = useState("sedentary");
 
-  // Fetch diets + workouts
+  const navigate = useNavigate();
+
+  // Fetch diets
   useEffect(() => {
     const fetchDiets = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
+
         const res = await api.get("/diets", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setDiets(res.data || []);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching diets:", err);
       }
     };
-    fetchDiets();
 
-    // Example workouts
-    setWorkouts([
-      { _id: 1, title: "Morning Run", duration: 30, caloriesBurned: 250 },
-      { _id: 2, title: "Strength Training", duration: 45, caloriesBurned: 400 },
-    ]);
+    fetchDiets();
   }, [navigate]);
 
-  // Logout
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
-
-  // Reset water at midnight
-  useEffect(() => {
-    const now = new Date();
-    const millisTillMidnight =
-      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
-    const timer = setTimeout(() => setWater(0), millisTillMidnight);
-    return () => clearTimeout(timer);
-  }, [water]);
-
-  // Auto-generate diet
-  const handleGenerateDiet = async () => {
+  // Generate diet
+  const handleGenerateDiet = async (e) => {
+    e.preventDefault();
+    if (!age || !weight || !height || !activityLevel) {
+      return alert("Please fill all fields");
+    }
     setLoadingDiet(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
 
-      // For now using dummy values, later you can open modal to ask user input
       const res = await api.post(
         "/diets/generate",
         {
-          age: 25,
-          weight: 70,
-          height: 175,
-          gender: "male",
-          activityLevel: "moderate",
+          age: Number(age),
+          weight: Number(weight),
+          height: Number(height),
+          gender,
+          activityLevel,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setDiets([...(diets || []), res.data]);
+      setDiets([...diets, res.data]);
+      setShowDietModal(false);
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Error generating diet");
@@ -118,7 +70,7 @@ export default function Dashboard() {
 
   // Delete diet
   const handleDeleteDiet = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this diet?")) return;
+    if (!window.confirm("Delete this diet?")) return;
     try {
       const token = localStorage.getItem("token");
       await api.delete(`/diets/${id}`, {
@@ -127,177 +79,140 @@ export default function Dashboard() {
       setDiets(diets.filter((d) => d._id !== id));
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Error deleting diet");
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-neutral-900 via-black to-neutral-950 text-white">
-      {/* Sidebar */}
-      <aside className="hidden md:flex w-64 bg-neutral-950 border-r border-neutral-800 flex-col justify-between py-6 px-4 shadow-xl">
-        <div className="mt-10">
-          <nav className="space-y-3">
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
-            >
-              <LayoutDashboard className="w-5 h-5" /> Dashboard
-            </Link>
-            <Link
-              to="/profile"
-              className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
-            >
-              <User className="w-5 h-5" /> Profile
-            </Link>
-            <Link
-              to="/workouts"
-              className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
-            >
-              <Dumbbell className="w-5 h-5" /> Workouts
-            </Link>
-            <Link
-              to="/water"
-              className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-neutral-800 transition"
-            >
-              <Droplets className="w-5 h-5" /> Water Intake
-            </Link>
-          </nav>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-300 hover:text-white hover:bg-red-600 transition"
-        >
-          <LogOut className="w-5 h-5" /> Logout
-        </button>
-      </aside>
+    <div className="p-6 bg-gray-900 min-h-screen text-white">
+      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-      {/* Main */}
-      <main className="flex-1 p-4 md:p-10 pt-20 md:pt-10 overflow-y-auto">
-        <header className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mt-9">
-              {user ? `Welcome, ${user.name}` : "Welcome"}
-            </h1>
-            <p className="text-gray-400 mt-2">
-              Track your fitness progress and daily goals.
-            </p>
-          </div>
-          <button
-            className="md:hidden text-white p-2 rounded-md"
-            onClick={() => alert("Open Mobile Menu")}
+      {/* Generate Button */}
+      <button
+        onClick={() => setShowDietModal(true)}
+        className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg"
+      >
+        Generate Diet
+      </button>
+
+      {/* Diet List */}
+      <div className="mt-6 space-y-4">
+        {diets.length === 0 && (
+          <p className="text-gray-400">No diets yet. Generate one!</p>
+        )}
+
+        {diets.map((diet) => (
+          <div
+            key={diet._id}
+            className="bg-gray-800 p-4 rounded-lg shadow-md"
           >
-            <Menu size={28} />
-          </button>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Diet Plans */}
-          <div className="col-span-1 lg:col-span-2 bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-neutral-800">
-            <div className="flex justify-between mb-4 items-center">
-              <h2 className="flex items-center gap-2 text-2xl font-semibold text-green-400">
-                <Salad /> Diet Plans
-              </h2>
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-semibold">{diet.title}</h2>
               <button
-                onClick={handleGenerateDiet}
-                className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl shadow-md text-white transition"
+                onClick={() => handleDeleteDiet(diet._id)}
+                className="text-red-500 hover:text-red-700"
               >
-                {loadingDiet ? "Generating..." : "+ Generate Diet"}
+                Delete
               </button>
             </div>
+            <p className="text-sm text-gray-400 mb-2">
+              Total Calories: {diet.totalCalories || 0}
+            </p>
 
-            {(!diets || diets.length === 0) && (
-              <p className="text-gray-400 text-sm">No diets yet.</p>
-            )}
-
-            <div className="space-y-4">
-              {diets.map((diet) => (
-                <motion.div
-                  key={diet._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-neutral-800 rounded-xl p-4 shadow-lg border border-neutral-700"
-                >
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">{diet.title}</h3>
-                    <button
-                      onClick={() => handleDeleteDiet(diet._id)}
-                      className="text-red-500 text-sm hover:underline"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-400">
-                    Total Calories: {diet.totalCalories} kcal
+            {/* Meals */}
+            <div className="space-y-2">
+              {(diet.meals || []).map((meal, idx) => (
+                <div key={idx} className="bg-gray-700 p-3 rounded-md">
+                  <h3 className="font-semibold">{meal.name}</h3>
+                  <p className="text-sm">
+                    {meal.calories} kcal | P: {meal.protein}g | C: {meal.carbs}g | F:{" "}
+                    {meal.fats}g
                   </p>
-                  {/* Meals */}
-                  <div className="mt-3 space-y-2">
-                    {(diet.meals || []).map((meal, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-neutral-900 p-3 rounded-lg border border-neutral-700"
-                      >
-                        <h4 className="text-sm font-semibold text-green-300">
-                          {meal.name} - {meal.calories} kcal
-                        </h4>
-                        <ul className="list-disc list-inside text-xs text-gray-400">
-                          {(meal.foods || []).map((f, i) => (
-                            <li key={i}>
-                              {f.name} ({f.calories} kcal, P:
-                              {f.protein}g C:{f.carbs}g F:{f.fats}g)
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                  <ul className="list-disc ml-5 text-sm">
+                    {(meal.foods || []).map((food, fIdx) => (
+                      <li key={fIdx}>
+                        {food.name} ({food.calories} kcal)
+                      </li>
                     ))}
-                  </div>
-                </motion.div>
+                  </ul>
+                </div>
               ))}
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* Workouts */}
-          <div className="bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-neutral-800">
-            <h2 className="flex items-center gap-2 text-2xl font-semibold text-blue-400 mb-4">
-              <Dumbbell /> Workouts
-            </h2>
-            {(!workouts || workouts.length === 0) && (
-              <p className="text-gray-400 text-sm">No workouts yet.</p>
-            )}
-            <ul className="space-y-3">
-              {workouts.map((w) => (
-                <li
-                  key={w._id}
-                  className="bg-neutral-800 p-3 rounded-lg text-sm border border-neutral-700"
+      {/* Diet Modal */}
+      {showDietModal && (
+        <div className="fixed inset-0 bg-black/70 flex justify-center items-center">
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Generate Diet</h2>
+            <form onSubmit={handleGenerateDiet} className="space-y-3">
+              <input
+                type="number"
+                placeholder="Age"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+                required
+              />
+              <input
+                type="number"
+                placeholder="Weight (kg)"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+                required
+              />
+              <input
+                type="number"
+                placeholder="Height (cm)"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+                required
+              />
+
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+
+              <select
+                value={activityLevel}
+                onChange={(e) => setActivityLevel(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+              >
+                <option value="sedentary">Sedentary</option>
+                <option value="lightly">Lightly Active</option>
+                <option value="moderate">Moderate</option>
+                <option value="active">Active</option>
+                <option value="very">Very Active</option>
+              </select>
+
+              <div className="flex justify-between mt-4">
+                <button
+                  type="submit"
+                  disabled={loadingDiet}
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
                 >
-                  <p className="font-semibold">{w.title}</p>
-                  <p className="text-gray-400">
-                    {w.duration} mins - {w.caloriesBurned} kcal burned
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Water */}
-          <div className="bg-neutral-900 rounded-3xl shadow-2xl p-6 border border-neutral-800">
-            <h2 className="flex items-center gap-2 text-2xl font-semibold text-cyan-400 mb-4">
-              <Droplets /> Water Intake
-            </h2>
-            <p className="text-gray-400 text-sm mb-2">Today’s intake:</p>
-            <p className="text-3xl font-bold text-cyan-300">
-              <AnimatedNumber value={water} /> ml
-            </p>
-            <button
-              onClick={() => setWater(water + 250)}
-              className="mt-4 bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-xl shadow-md text-white transition"
-            >
-              + Add 250ml
-            </button>
+                  {loadingDiet ? "Generating..." : "Generate"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDietModal(false)}
+                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </main>
+      )}
     </div>
   );
-}
-
 }
