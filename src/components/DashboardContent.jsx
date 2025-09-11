@@ -1,7 +1,7 @@
 // Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
   ChevronDown,
@@ -19,7 +19,6 @@ import {
 
 export default function Dashboard() {
   const [diets, setDiets] = useState([]);
-  const [showDietModal, setShowDietModal] = useState(false);
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [expandedMeal, setExpandedMeal] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -76,7 +75,6 @@ export default function Dashboard() {
       );
 
       setDiets([res.data]);
-      setShowDietModal(false);
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Error generating diet");
@@ -113,23 +111,78 @@ export default function Dashboard() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300 z-40 flex flex-col justify-between`}
       >
-        <div className="p-6 flex flex-col gap-6">
-          <button
-            onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition"
-          >
-            <Plus size={18} /> Generate Diet
-          </button>
+        {/* Top - Generate Diet Form */}
+        <div className="p-6 overflow-y-auto">
+          <h2 className="text-xl font-bold mb-4">Generate Daily Diet</h2>
+          <form onSubmit={handleGenerateDiet} className="space-y-3">
+            <input
+              type="number"
+              placeholder="Age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-700 rounded"
+              required
+            />
+            <input
+              type="number"
+              placeholder="Weight (kg)"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-700 rounded"
+              required
+            />
+            <input
+              type="number"
+              placeholder="Height (cm)"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-700 rounded"
+              required
+            />
+            <select
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-700 rounded"
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <select
+              value={activityLevel}
+              onChange={(e) => setActivityLevel(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-700 rounded"
+            >
+              <option value="sedentary">Sedentary</option>
+              <option value="lightly">Lightly Active</option>
+              <option value="moderate">Moderate</option>
+              <option value="active">Active</option>
+              <option value="very">Very Active</option>
+            </select>
+            <button
+              type="submit"
+              disabled={loadingDiet}
+              className="bg-green-600 hover:bg-green-700 w-full px-4 py-2 rounded-lg"
+            >
+              {loadingDiet ? "Generating..." : "Generate"}
+            </button>
+          </form>
         </div>
 
+        {/* Bottom - User info & Logout */}
         <div className="p-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <User className="text-gray-300" />
             <span className="font-semibold">{user?.name || "User"}</span>
           </div>
+          <Link
+            to="/profile"
+            className="flex items-center gap-2 mb-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg transition w-full"
+          >
+            Edit Profile
+          </Link>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition w-full"
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg transition w-full"
           >
             <LogOut size={18} /> Logout
           </button>
@@ -147,11 +200,9 @@ export default function Dashboard() {
         </button>
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-          <h1 className="text-3xl font-bold">
-            👋 Hello, <span className="text-green-400">{user?.name || "User"}</span>
-          </h1>
-        </div>
+        <h1 className="text-3xl font-bold mb-8">
+          👋 Hello, <span className="text-green-400">{user?.name || "User"}</span>
+        </h1>
 
         {/* Stats Section */}
         {diets.length > 0 && (
@@ -170,7 +221,7 @@ export default function Dashboard() {
                 <h2 className="text-xl font-bold">{diets[0]?.meals?.length || 0}</h2>
               </div>
             </div>
-            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
+            <div className="p-5 bg-gray-800/60 rounded-xl shadow-lg flex items-center gap-4">
               <Activity className="text-blue-400" size={28} />
               <div>
                 <p className="text-sm text-gray-400">Activity</p>
@@ -184,7 +235,7 @@ export default function Dashboard() {
         <div className="grid md:grid-cols-2 gap-6">
           {diets.length === 0 && (
             <div className="col-span-full text-center text-gray-400">
-              No diets yet. Click <b>Generate Diet</b> to start!
+              No diets yet. Use the form on the left to generate a diet!
             </div>
           )}
 
@@ -230,76 +281,6 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
-
-      {/* Diet Modal */}
-      {showDietModal && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="bg-gray-800 p-6 rounded-xl w-96 shadow-xl">
-            <h2 className="text-xl font-bold mb-4">Generate Diet</h2>
-            <form onSubmit={handleGenerateDiet} className="space-y-3">
-              <input
-                type="number"
-                placeholder="Age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Weight (kg)"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-                required
-              />
-              <input
-                type="number"
-                placeholder="Height (cm)"
-                value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-                required
-              />
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-              >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-              <select
-                value={activityLevel}
-                onChange={(e) => setActivityLevel(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 rounded"
-              >
-                <option value="sedentary">Sedentary</option>
-                <option value="lightly">Lightly Active</option>
-                <option value="moderate">Moderate</option>
-                <option value="active">Active</option>
-                <option value="very">Very Active</option>
-              </select>
-              <div className="flex justify-between mt-4">
-                <button
-                  type="submit"
-                  disabled={loadingDiet}
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
-                >
-                  {loadingDiet ? "Generating..." : "Generate"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowDietModal(false)}
-                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
