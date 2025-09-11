@@ -118,7 +118,7 @@ export default function Dashboard() {
         } md:translate-x-0 transition-transform duration-300 z-40`}
       >
         <div className="p-6 flex flex-col gap-6">
-          <h2 className="text-2xl font-bold text-green-400">HealthPlanner</h2>
+          
           <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
             <User className="text-gray-300" />
             <span>{user?.username || "User"}</span>
@@ -149,7 +149,7 @@ export default function Dashboard() {
           </h1>
           <button
             onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition mt-10"
           >
             <Plus size={18} /> Generate Diet
           </button>
