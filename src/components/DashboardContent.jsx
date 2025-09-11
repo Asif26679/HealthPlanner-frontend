@@ -11,6 +11,9 @@ import {
   X,
   LogOut,
   User,
+  Utensils,
+  Flame,
+  Activity,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -53,7 +56,7 @@ export default function Dashboard() {
     fetchData();
   }, [navigate]);
 
-  // Generate diet (delete old one first)
+  // Generate diet (delete old first)
   const handleGenerateDiet = async (e) => {
     e.preventDefault();
     if (!age || !weight || !height || !activityLevel) {
@@ -64,7 +67,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
 
-      // delete all old diets before generating new
+      // delete old diets
       for (let d of diets) {
         await api.delete(`/diets/${d._id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -110,19 +113,19 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
       {/* Sidebar */}
       <div
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800 shadow-lg transform ${
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800/90 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300 z-40`}
       >
         <div className="p-6 flex flex-col gap-6">
-          <h2 className="text-2xl font-bold">HealthPlanner</h2>
-          <div className="flex items-center gap-3">
-            <User className="text-gray-400" />
+          <h2 className="text-2xl font-bold text-green-400">HealthPlanner</h2>
+          <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+            <User className="text-gray-300" />
             <span>{user?.username || "User"}</span>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition"
           >
             <LogOut size={18} /> Logout
           </button>
@@ -140,17 +143,44 @@ export default function Dashboard() {
         </button>
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">
-            👋 Hello, {user?.username || "User"}
+            👋 Hello, <span className="text-green-400">{user?.username || "User"}</span>
           </h1>
           <button
             onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition"
           >
             <Plus size={18} /> Generate Diet
           </button>
         </div>
+
+        {/* Stats Section */}
+        {diets.length > 0 && (
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
+              <Flame className="text-orange-400" size={28} />
+              <div>
+                <p className="text-sm text-gray-400">Total Calories</p>
+                <h2 className="text-xl font-bold">{diets[0].totalCalories || 0} kcal</h2>
+              </div>
+            </div>
+            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
+              <Utensils className="text-green-400" size={28} />
+              <div>
+                <p className="text-sm text-gray-400">Meals</p>
+                <h2 className="text-xl font-bold">{diets[0].meals?.length || 0}</h2>
+              </div>
+            </div>
+            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
+              <Activity className="text-blue-400" size={28} />
+              <div>
+                <p className="text-sm text-gray-400">Activity</p>
+                <h2 className="text-xl font-bold">{activityLevel}</h2>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Diet List */}
         <div className="grid md:grid-cols-2 gap-6">
@@ -163,7 +193,7 @@ export default function Dashboard() {
           {diets.map((diet) => (
             <div
               key={diet._id}
-              className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5"
+              className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 hover:scale-[1.02] transition"
             >
               {/* Header */}
               <div className="flex justify-between items-center mb-4">
@@ -175,7 +205,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => handleDeleteDiet(diet._id)}
-                  className="text-red-500 hover:text-red-600"
+                  className="text-red-500 hover:text-red-600 transition"
                 >
                   <Trash2 size={20} />
                 </button>
@@ -184,7 +214,7 @@ export default function Dashboard() {
               {/* Meals Accordion */}
               <div className="space-y-3">
                 {(diet.meals || []).map((meal, idx) => (
-                  <div key={idx} className="bg-gray-700 rounded-lg">
+                  <div key={idx} className="bg-gray-700/50 rounded-lg overflow-hidden">
                     <button
                       onClick={() =>
                         setExpandedMeal(expandedMeal === idx ? null : idx)
@@ -203,7 +233,7 @@ export default function Dashboard() {
                     </button>
 
                     {expandedMeal === idx && (
-                      <div className="px-4 pb-3 space-y-2 text-sm text-gray-300">
+                      <div className="px-4 pb-3 space-y-2 text-sm text-gray-300 animate-fadeIn">
                         <p>
                           Protein: {meal.protein}g | Carbs: {meal.carbs}g | Fats:{" "}
                           {meal.fats}g
