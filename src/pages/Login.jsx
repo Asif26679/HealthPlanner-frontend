@@ -28,7 +28,7 @@ export default function Login() {
 
       // Save in context and localStorage
       login(data.user, data.token);
-
+      
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
