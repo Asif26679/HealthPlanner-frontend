@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   ChevronDown,
   ChevronUp,
@@ -29,8 +30,9 @@ export default function Dashboard() {
   const [gender, setGender] = useState("male");
   const [activityLevel, setActivityLevel] = useState("sedentary");
 
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Fetch user and diets
   useEffect(() => {
@@ -120,7 +122,7 @@ export default function Dashboard() {
         <div className="p-6 flex flex-col gap-6">
           <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
             <User className="text-gray-300" />
-            <span className="font-semibold">{user?.username || "User"}</span>
+            <span className="font-semibold">{user?.name || "User"}</span>
           </div>
           <button
             onClick={handleLogout}
@@ -144,7 +146,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <h1 className="text-3xl font-bold">
-            👋 Hello, <span className="text-green-400">{user?.username || "User"}</span>
+            👋 Hello, <span className="text-green-400">{user?.name || "User"}</span>
           </h1>
           <button
             onClick={() => setShowDietModal(true)}
