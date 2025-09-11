@@ -21,7 +21,7 @@ export default function Dashboard() {
   const [diets, setDiets] = useState([]);
   const [showDietModal, setShowDietModal] = useState(false);
   const [loadingDiet, setLoadingDiet] = useState(false);
-  const [expandedMeals, setExpandedMeals] = useState({});
+  const [expandedMeal, setExpandedMeal] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [age, setAge] = useState("");
