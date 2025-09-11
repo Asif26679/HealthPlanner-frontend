@@ -148,7 +148,7 @@ export default function Dashboard() {
           </h1>
           <button
             onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-5 py-3 rounded-lg shadow-lg transition text-lg"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-5 py-3 rounded-lg shadow-lg transition text-lg mt-10"
           >
             <Plus size={20} /> Generate Diet
           </button>
