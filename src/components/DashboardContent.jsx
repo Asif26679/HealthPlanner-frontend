@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [showDietModal, setShowDietModal] = useState(false);
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [expandedMeal, setExpandedMeal] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
@@ -29,11 +30,9 @@ export default function Dashboard() {
   const [activityLevel, setActivityLevel] = useState("sedentary");
 
   const [user, setUser] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const navigate = useNavigate();
 
-  // Fetch diets + user
+  // Fetch user and diets
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,7 +42,7 @@ export default function Dashboard() {
         const resUser = await api.get("/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(resUser.data);
+        setUser(resUser.data.user); // user object
 
         const res = await api.get("/diets", {
           headers: { Authorization: `Bearer ${token}` },
@@ -56,7 +55,7 @@ export default function Dashboard() {
     fetchData();
   }, [navigate]);
 
-  // Generate diet (delete old first)
+  // Generate new diet
   const handleGenerateDiet = async (e) => {
     e.preventDefault();
     if (!age || !weight || !height || !activityLevel) {
@@ -80,7 +79,7 @@ export default function Dashboard() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setDiets([res.data]); // keep only latest
+      setDiets([res.data]);
       setShowDietModal(false);
     } catch (err) {
       console.error(err);
@@ -104,23 +103,24 @@ export default function Dashboard() {
     }
   };
 
+  // Logout
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.clear();
     navigate("/login");
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
       {/* Sidebar */}
       <div
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-gradient-to-b from-gray-800 to-black shadow-xl transform ${
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800/90 backdrop-blur-lg shadow-xl transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-300 z-40`}
       >
         <div className="p-6 flex flex-col gap-6">
           <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
             <User className="text-gray-300" />
-            <span className="font-medium text-lg">{user?.username || "User"}</span>
+            <span className="font-semibold">{user?.username || "User"}</span>
           </div>
           <button
             onClick={handleLogout}
@@ -142,47 +142,47 @@ export default function Dashboard() {
         </button>
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-          <h1 className="text-3xl font-bold text-center md:text-left">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+          <h1 className="text-3xl font-bold">
             👋 Hello, <span className="text-green-400">{user?.username || "User"}</span>
           </h1>
           <button
             onClick={() => setShowDietModal(true)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-5 py-3 rounded-lg shadow-lg transition text-lg mt-10"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-lg transition"
           >
-            <Plus size={20} /> Generate Diet
+            <Plus size={18} /> Generate Diet
           </button>
         </div>
 
         {/* Stats Section */}
         {diets.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="p-5 bg-gray-800/70 rounded-2xl shadow-lg flex items-center gap-4 backdrop-blur-md">
-              <Flame className="text-orange-400" size={32} />
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
+              <Flame className="text-orange-400" size={28} />
               <div>
                 <p className="text-sm text-gray-400">Total Calories</p>
-                <h2 className="text-2xl font-bold">{diets[0].totalCalories || 0} kcal</h2>
+                <h2 className="text-xl font-bold">{diets[0].totalCalories || 0} kcal</h2>
               </div>
             </div>
-            <div className="p-5 bg-gray-800/70 rounded-2xl shadow-lg flex items-center gap-4 backdrop-blur-md">
-              <Utensils className="text-green-400" size={32} />
+            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
+              <Utensils className="text-green-400" size={28} />
               <div>
                 <p className="text-sm text-gray-400">Meals</p>
-                <h2 className="text-2xl font-bold">{diets[0].meals?.length || 0}</h2>
+                <h2 className="text-xl font-bold">{diets[0].meals?.length || 0}</h2>
               </div>
             </div>
-            <div className="p-5 bg-gray-800/70 rounded-2xl shadow-lg flex items-center gap-4 backdrop-blur-md">
-              <Activity className="text-blue-400" size={32} />
+            <div className="p-5 bg-gray-800/60 rounded-xl backdrop-blur-lg shadow-lg flex items-center gap-4">
+              <Activity className="text-blue-400" size={28} />
               <div>
                 <p className="text-sm text-gray-400">Activity</p>
-                <h2 className="text-2xl font-bold capitalize">{activityLevel}</h2>
+                <h2 className="text-xl font-bold">{activityLevel}</h2>
               </div>
             </div>
           </div>
         )}
 
         {/* Diet List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {diets.length === 0 && (
             <div className="col-span-full text-center text-gray-400">
               No diets yet. Click <b>Generate Diet</b> to start!
@@ -192,7 +192,7 @@ export default function Dashboard() {
           {diets.map((diet) => (
             <div
               key={diet._id}
-              className="bg-gray-800/80 border border-gray-700 rounded-2xl shadow-lg p-6 hover:scale-[1.01] transition backdrop-blur-md"
+              className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 hover:scale-[1.02] transition"
             >
               {/* Header */}
               <div className="flex justify-between items-center mb-4">
@@ -213,10 +213,7 @@ export default function Dashboard() {
               {/* Meals Accordion */}
               <div className="space-y-3">
                 {(diet.meals || []).map((meal, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-700/60 rounded-lg overflow-hidden shadow-sm"
-                  >
+                  <div key={idx} className="bg-gray-700/50 rounded-lg overflow-hidden">
                     <button
                       onClick={() =>
                         setExpandedMeal(expandedMeal === idx ? null : idx)
@@ -225,7 +222,7 @@ export default function Dashboard() {
                     >
                       <span className="font-medium">{meal.name}</span>
                       <span className="text-sm text-gray-300">
-                        {meal.calories} kcal
+                        {meal.foods?.reduce((a, f) => a + f.calories, 0) || 0} kcal
                       </span>
                       {expandedMeal === idx ? (
                         <ChevronUp size={18} />
@@ -236,17 +233,15 @@ export default function Dashboard() {
 
                     {expandedMeal === idx && (
                       <div className="px-4 pb-3 space-y-2 text-sm text-gray-300 animate-fadeIn">
-                        <p>
-                          Protein: {meal.protein}g | Carbs: {meal.carbs}g | Fats:{" "}
-                          {meal.fats}g
-                        </p>
-                        <ul className="list-disc ml-5 space-y-1">
-                          {(meal.foods || []).map((food, fIdx) => (
-                            <li key={fIdx}>
-                              {food.name} ({food.calories} kcal)
-                            </li>
-                          ))}
-                        </ul>
+                        {meal.foods?.map((food, fIdx) => (
+                          <div
+                            key={fIdx}
+                            className="flex justify-between bg-gray-800/30 px-3 py-2 rounded-lg"
+                          >
+                            <span>{food.name}</span>
+                            <span>{food.calories} kcal</span>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -260,7 +255,7 @@ export default function Dashboard() {
       {/* Diet Modal */}
       {showDietModal && (
         <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
-          <div className="bg-gray-800 p-6 rounded-2xl w-96 shadow-xl animate-fadeIn">
+          <div className="bg-gray-800 p-6 rounded-xl w-96 shadow-xl">
             <h2 className="text-xl font-bold mb-4">Generate Diet</h2>
             <form onSubmit={handleGenerateDiet} className="space-y-3">
               <input
@@ -268,7 +263,7 @@ export default function Dashboard() {
                 placeholder="Age"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
                 required
               />
               <input
@@ -276,7 +271,7 @@ export default function Dashboard() {
                 placeholder="Weight (kg)"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
                 required
               />
               <input
@@ -284,23 +279,21 @@ export default function Dashboard() {
                 placeholder="Height (cm)"
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
                 required
               />
-
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
               >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
-
               <select
                 value={activityLevel}
                 onChange={(e) => setActivityLevel(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 bg-gray-700 rounded"
               >
                 <option value="sedentary">Sedentary</option>
                 <option value="lightly">Lightly Active</option>
@@ -308,19 +301,18 @@ export default function Dashboard() {
                 <option value="active">Active</option>
                 <option value="very">Very Active</option>
               </select>
-
               <div className="flex justify-between mt-4">
                 <button
                   type="submit"
                   disabled={loadingDiet}
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg shadow-md"
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
                 >
                   {loadingDiet ? "Generating..." : "Generate"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDietModal(false)}
-                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg shadow-md"
+                  className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
                 >
                   Cancel
                 </button>
