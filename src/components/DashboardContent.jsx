@@ -24,7 +24,7 @@ export default function Dashboard() {
   const [diets, setDiets] = useState([]);
   const [expandedDiet, setExpandedDiet] = useState(null);
   const [expandedMeal, setExpandedMeal] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Fetch diets
   useEffect(() => {
@@ -36,8 +36,6 @@ export default function Dashboard() {
         const res = await api.get("/diets", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("Diet API Response:", res.data); // 🔍 Debug
         setDiets(res.data || []);
       } catch (err) {
         console.error("Error fetching diets:", err);
@@ -75,48 +73,64 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white">
-      {/* Navbar */}
-      <nav className="flex items-center justify-between p-4 bg-gray-900 shadow-lg sticky top-0 z-50">
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <Utensils className="w-6 h-6 text-green-400" />
-          HealthPlanner
+    <div className="flex h-screen bg-gray-950 text-white">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden md:flex flex-col w-64 bg-gray-900 border-r border-gray-800 p-6">
+        <h1 className="text-2xl font-bold flex items-center gap-2 mb-8">
+          <Utensils className="w-7 h-7 text-green-400" /> HealthPlanner
         </h1>
 
-        {/* Desktop menu */}
-        <div className="hidden md:flex items-center gap-4">
+        <nav className="flex flex-col gap-4 flex-1">
+          <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800">
+            <User size={18} /> Profile
+          </button>
           <button
             onClick={logout}
-            className="flex items-center gap-2 bg-red-600 px-3 py-2 rounded-lg hover:bg-red-700"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-600/80"
           >
             <LogOut size={18} /> Logout
           </button>
-        </div>
+        </nav>
+      </aside>
 
-        {/* Mobile menu toggle */}
+      {/* Mobile Topbar */}
+      <div className="md:hidden fixed top-0 left-0 w-full flex justify-between items-center bg-gray-900 px-4 py-3 z-50 shadow-md">
+        <h1 className="text-lg font-bold flex items-center gap-2">
+          <Utensils className="w-6 h-6 text-green-400" /> HealthPlanner
+        </h1>
         <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 bg-gray-800 rounded-lg"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 bg-gray-800 rounded-lg"
         >
-          {menuOpen ? <X /> : <Menu />}
+          {sidebarOpen ? <X /> : <Menu />}
         </button>
-      </nav>
+      </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-gray-900 p-4 flex flex-col gap-3 shadow-lg">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="md:hidden fixed top-0 left-0 w-64 h-full bg-gray-900 p-6 shadow-lg z-40">
           <button
-            onClick={logout}
-            className="flex items-center gap-2 bg-red-600 px-3 py-2 rounded-lg hover:bg-red-700"
+            onClick={() => setSidebarOpen(false)}
+            className="absolute top-4 right-4 p-2 bg-gray-800 rounded-lg"
           >
-            <LogOut size={18} /> Logout
+            <X />
           </button>
+          <nav className="mt-10 flex flex-col gap-4">
+            <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800">
+              <User size={18} /> Profile
+            </button>
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-600/80"
+            >
+              <LogOut size={18} /> Logout
+            </button>
+          </nav>
         </div>
       )}
 
       {/* Main Content */}
-      <main className="p-6 max-w-6xl mx-auto">
-        {/* Generate button */}
+      <main className="flex-1 overflow-y-auto p-6 mt-12 md:mt-0">
         <div className="flex justify-end mb-6">
           <button
             onClick={generateDiet}
@@ -126,14 +140,13 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Diets list */}
         <div className="grid md:grid-cols-2 gap-6">
           {(diets || []).map((diet, dietIdx) => (
             <div
               key={diet._id || dietIdx}
-              className="bg-gray-800/70 p-4 rounded-2xl shadow-lg hover:shadow-xl transition"
+              className="bg-gray-800/70 p-5 rounded-2xl shadow-lg hover:shadow-xl transition"
             >
-              {/* Diet header */}
+              {/* Diet Header */}
               <button
                 onClick={() =>
                   setExpandedDiet(expandedDiet === dietIdx ? null : dietIdx)
@@ -147,7 +160,7 @@ export default function Dashboard() {
                 {expandedDiet === dietIdx ? <ChevronUp /> : <ChevronDown />}
               </button>
 
-              {/* Diet content */}
+              {/* Diet Content */}
               {expandedDiet === dietIdx && (
                 <div className="mt-4 space-y-3">
                   <div className="flex justify-between text-sm text-gray-400">
@@ -156,9 +169,9 @@ export default function Dashboard() {
                     </span>
                     <button
                       onClick={() => deleteDiet(diet._id)}
-                      className="text-red-500 hover:text-red-700 flex items-center gap-1"
+                      className="text-red-500 hover:text-red-700"
                     >
-                      <Trash2 size={16} /> Delete
+                      <Trash2 size={18} />
                     </button>
                   </div>
 
