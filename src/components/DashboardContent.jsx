@@ -234,50 +234,56 @@ export default function Dashboard() {
         )}
 
         {/* Diet List */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {diets.length === 0 && (
-            <div className="col-span-full text-center text-gray-400">
-              No diets yet. Use the form on the left to generate a diet!
-            </div>
-          )}
-          {diets.map((diet) => (
-            <div key={diet._id} className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6 hover:scale-105 transform transition">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">{diet.title || "Diet Plan"}</h2>
-                <span className="text-green-400 font-semibold">{diet.totalCalories || 0} kcal</span>
+        {/* Diet List */}
+<div className="grid md:grid-cols-2 gap-6">
+  {diets.length === 0 && (
+    <div className="col-span-full text-center text-gray-400">
+      No diets yet. Use the form on the left to generate a diet!
+    </div>
+  )}
+
+  {diets.map((diet) => (
+    <div key={diet._id} className="bg-gray-800/70 border border-gray-700 rounded-xl shadow-lg p-5 mb-6 hover:scale-105 transform transition">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">{diet.title || "Diet Plan"}</h2>
+        <span className="text-green-400 font-semibold">{diet.totalCalories || 0} kcal</span>
+      </div>
+
+      {/* Meals Accordion */}
+      {(diet.meals || []).map((meal, idx) => (
+        <div key={idx} className={`mb-4 rounded-lg overflow-hidden bg-gradient-to-r ${mealColors[idx % mealColors.length]} shadow-md`}>
+          <button
+            onClick={() => setExpandedMeal(expandedMeal === `${diet._id}-${idx}` ? null : `${diet._id}-${idx}`)}
+            className="w-full flex justify-between items-center px-4 py-2 font-medium text-gray-900"
+          >
+            <span>{meal?.name || `Meal ${idx + 1}`}</span>
+            <span>{meal?.calories || 0} kcal</span>
+            {expandedMeal === `${diet._id}-${idx}` ? <ChevronUp /> : <ChevronDown />}
+          </button>
+
+          <div
+            className={`transition-all duration-300 overflow-hidden ${
+              expandedMeal === `${diet._id}-${idx}` ? "max-h-[1000px] py-2" : "max-h-0"
+            }`}
+          >
+            {(meal.foods || []).map((food, fIdx) => (
+              <div key={fIdx} className="flex justify-between bg-gray-100/20 px-3 py-2 rounded-lg mb-1 mx-2">
+                <span>{food?.name}</span>
+                <span>{food?.calories || 0} kcal</span>
               </div>
-
-              {(diet.meals || []).map((meal, idx) => (
-                <div key={idx} className={`mb-4 rounded-lg overflow-hidden bg-gradient-to-r ${mealColors[idx % mealColors.length]} shadow-md`}>
-                  <button
-                    onClick={() => setExpandedMeal(expandedMeal === idx ? null : idx)}
-                    className="w-full flex justify-between items-center px-4 py-2 font-medium text-gray-900"
-                  >
-                    <span>{meal?.name || `Meal ${idx + 1}`}</span>
-                    <span>{meal?.calories || 0} kcal</span>
-                    {expandedMeal === idx ? <ChevronUp /> : <ChevronDown />}
-                  </button>
-
-                  {expandedMeal === idx && (
-                    <div className="px-4 py-2 space-y-2 text-gray-900">
-                      {(meal.foods || []).map((food, fIdx) => (
-                        <div key={fIdx} className="flex justify-between bg-gray-100/20 px-3 py-2 rounded-lg">
-                          <span>{food?.name}</span>
-                          <span>{food?.calories || 0} kcal</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              <button onClick={() => handleDeleteDiet(diet._id)}
-                className="mt-2 flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg text-sm">
-                <Trash2 size={16} /> Delete Diet
-              </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      ))}
+
+      <button onClick={() => handleDeleteDiet(diet._id)}
+        className="mt-2 flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg text-sm">
+        <Trash2 size={16} /> Delete Diet
+      </button>
+    </div>
+  ))}
+</div>
+
       </div>
     </div>
   );
