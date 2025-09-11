@@ -42,7 +42,7 @@ export default function Dashboard() {
         const resUser = await api.get("/users/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(resUser.data.user); // user object
+        setUser(resUser.data.user); 
 
         const res = await api.get("/diets", {
           headers: { Authorization: `Bearer ${token}` },
