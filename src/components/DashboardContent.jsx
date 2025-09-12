@@ -182,7 +182,7 @@ export default function Dashboard() {
     title="Export Report"
     icon={FileText}
     gradient="bg-gradient-to-r from-green-400 to-green-600"
-    onClick={() => exportDietPDF(diets[0])} // function to generate PDF
+    onClick={() => exportDietPDF(diets[0],user)} // function to generate PDF
   />
           </div>
         )}
