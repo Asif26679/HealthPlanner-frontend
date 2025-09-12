@@ -2,6 +2,13 @@ import React from "react";
 import { Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 
+const mealColors = {
+  Breakfast: "from-yellow-400 to-yellow-500",
+  Lunch: "from-green-400 to-green-500",
+  Dinner: "from-orange-400 to-orange-500",
+  Snacks: "from-pink-400 to-pink-500",
+};
+
 export default function DietCard({ diet, handleDeleteDiet }) {
   return (
     <motion.div
@@ -9,7 +16,7 @@ export default function DietCard({ diet, handleDeleteDiet }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-gray-800 rounded-2xl shadow-lg p-5 flex flex-col gap-4 hover:shadow-2xl transition-shadow"
+      className="bg-gray-900 rounded-3xl shadow-2xl p-6 flex flex-col gap-5 hover:shadow-3xl transition-shadow"
     >
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -23,38 +30,42 @@ export default function DietCard({ diet, handleDeleteDiet }) {
         </button>
       </div>
 
-      {/* Nutrition Stats */}
-      <div className="grid grid-cols-3 gap-4 text-center bg-gray-700 rounded-xl p-3">
+      {/* Total Nutrition */}
+      <div className="grid grid-cols-3 gap-4 text-center bg-gray-800 rounded-2xl p-4">
         <div className="flex flex-col items-center">
-          <span className="text-lg font-semibold">{diet.totalCalories || 0} kcal</span>
+          <span className="text-lg font-bold">{diet.totalCalories || 0} kcal</span>
           <p className="text-sm text-gray-400">Calories</p>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-lg font-semibold">{diet.totalProtein || 0} g</span>
+          <span className="text-lg font-bold">{diet.totalProtein || 0} g</span>
           <p className="text-sm text-gray-400">Protein</p>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-lg font-semibold">{diet.totalCarbs || 0} g</span>
+          <span className="text-lg font-bold">{diet.totalCarbs || 0} g</span>
           <p className="text-sm text-gray-400">Carbs</p>
         </div>
       </div>
 
       {/* Meals */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {diet.meals?.map((meal) => (
-          <div
-            key={meal._id}
-            className="bg-gray-700 rounded-xl p-3 hover:bg-gray-600 transition"
-          >
-            <h3 className="font-semibold text-green-300 mb-2">{meal.name}</h3>
-            <ul className="list-disc list-inside text-gray-300 text-sm">
+          <div key={meal._id} className="bg-gray-800 rounded-2xl p-4">
+            <h3
+              className={`font-semibold text-white text-lg mb-3 bg-gradient-to-r ${mealColors[meal.name] || "from-blue-400 to-blue-500"} inline-block px-3 py-1 rounded-full`}
+            >
+              {meal.name}
+            </h3>
+            <div className="flex flex-wrap gap-2">
               {meal.items?.map((item) => (
-                <li key={item._id}>
-                  <span className="font-medium">{item.name}</span>{" "}
-                  - <span className="text-gray-400">{item.calories} kcal</span>
-                </li>
+                <span
+                  key={item._id}
+                  className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-full text-gray-200 text-sm flex items-center gap-1"
+                  title={`${item.name} - ${item.calories} kcal`}
+                >
+                  {item.name} ({item.calories} kcal)
+                </span>
               ))}
-            </ul>
+            </div>
           </div>
         ))}
       </div>
