@@ -3,7 +3,7 @@ import api from "../utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Menu, X, LogOut, User, Utensils, Flame,  FileText, ChevronDown, ChevronUp } from "lucide-react";
-
+import SkeletonCard from "./SkeletonCard";
 import { exportDietPDF } from "../utils/exportDiet";
 
 import StatsCard from "./StatsCard";
@@ -107,12 +107,6 @@ export default function Dashboard() {
     navigate("/login");
   };
 
-  // const handleExportReport = () => {
-  //   if (!diets[0]) return alert("No diet to export");
-  //   const diet = diets[0];
-  //   const userInfo = { name: user.name, age, weight, height, gender, activityLevel };
-  //   exportDietPDF(userInfo, diet);
-  // };
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white pt-20 relative">
       {/* Mobile Overlay */}
@@ -174,18 +168,36 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold mb-8">👋 Hello, <span className="text-green-400">{user?.name || "User"}</span></h1>
 
         {/* Stats */}
-        {diets.length > 0 && (
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <StatsCard title="Total Calories" value={`${diets[0]?.totalCalories || 0} kcal`} icon={Flame} gradient="bg-gradient-to-r from-orange-500 to-yellow-400" />
-            <StatsCard title="Meals" value={diets[0]?.meals?.length || 0} icon={Utensils} gradient="bg-gradient-to-r from-green-400 to-green-600" />
-            <StatsCard
-    title="Export Report"
-    icon={FileText}
-    gradient="bg-gradient-to-r from-green-400 to-green-600"
-    onClick={() => exportDietPDF(diets[0],user)} // function to generate PDF
-  />
-          </div>
-        )}
+        {loadingDiet ? (
+  <div className="grid md:grid-cols-3 gap-6 mb-8">
+    {Array(3).fill().map((_, i) => (
+      <SkeletonCard key={i} />
+    ))}
+  </div>
+) : (
+  diets.length > 0 && (
+    <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <StatsCard
+        title="Total Calories"
+        value={`${diets[0]?.totalCalories || 0} kcal`}
+        icon={Flame}
+        gradient="bg-gradient-to-r from-orange-500 to-yellow-400"
+      />
+      <StatsCard
+        title="Meals"
+        value={diets[0]?.meals?.length || 0}
+        icon={Utensils}
+        gradient="bg-gradient-to-r from-green-400 to-green-600"
+      />
+      <StatsCard
+        title="Export Report"
+        icon={FileText}
+        gradient="bg-gradient-to-r from-green-400 to-green-600"
+        onClick={() => exportDietPDF(diets[0], user)}
+      />
+    </div>
+  )
+)}
 
         {/* Diet List */}
         <div className="grid md:grid-cols-2 gap-6">
