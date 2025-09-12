@@ -12,6 +12,7 @@ export const exportDietPDF = (diet) => {
 
   // User Info
   doc.setFontSize(12);
+  doc.text(`User: ${user?.name || "N/A"}`, 14, 30);
   doc.text(`Age: ${diet.age || "-"}`, 14, 30);
   doc.text(`Weight: ${diet.weight || "-"} kg`, 14, 36);
   doc.text(`Height: ${diet.height || "-"} cm`, 14, 42);
