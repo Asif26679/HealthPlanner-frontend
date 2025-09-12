@@ -192,9 +192,10 @@ export default function Dashboard() {
         gradient="bg-gradient-to-r from-green-400 to-green-600"
       /> */}
       <StatsCard
-        title="Export Report"
+        title="Download Report"
         icon={Download}
         gradient="bg-gradient-to-r from-gray-600 to-gray-800"
+        className="text-white"
         onClick={() => exportDietPDF(diets[0],user)}  
       />
     </div>
