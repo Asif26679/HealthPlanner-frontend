@@ -1,6 +1,6 @@
 // DietCard.jsx
 import React, { useState } from "react";
-import { Trash2, Clock, Coffee, Apple, Meat, Zap, X } from "lucide-react";
+import { Trash2, Clock, Coffee, Apple, Zap, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Modal to show meal details
@@ -78,7 +78,7 @@ export default function DietCard({ diet, onDelete }) {
     "bg-gradient-to-r from-green-400 to-green-500", // Snacks
   ];
 
-  const mealIcons = [Coffee, Meat, Zap, Apple];
+  const mealIcons = [Coffee,  Zap, Apple];
 
   return (
     <div className="bg-gray-900 rounded-2xl shadow-lg p-5 mb-6">
