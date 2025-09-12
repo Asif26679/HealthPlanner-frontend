@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Trash2, Clock, Zap } from "lucide-react";
+import { Trash2, Clock, Zap } from "lucide-react"; // Zap for calories
 import { motion, AnimatePresence } from "framer-motion";
 
 const mealColors = [
@@ -31,9 +31,14 @@ export default function DietCard({ diet, handleDeleteDiet }) {
       {/* Meals */}
       <div className="space-y-3">
         {(diet.meals || []).map((meal, idx) => (
-          <div key={idx} className={`rounded-xl overflow-hidden bg-gradient-to-r ${mealColors[idx % mealColors.length]} shadow-lg`}>
+          <div
+            key={idx}
+            className={`rounded-xl overflow-hidden bg-gradient-to-r ${mealColors[idx % mealColors.length]} shadow-lg`}
+          >
             <button
-              onClick={() => setExpandedMeal(expandedMeal === idx ? null : idx)}
+              onClick={() =>
+                setExpandedMeal(expandedMeal === idx ? null : idx)
+              }
               className="w-full flex justify-between items-center px-4 py-3 font-semibold text-gray-900 hover:bg-white/20 transition"
             >
               <span>{meal.name}</span>
