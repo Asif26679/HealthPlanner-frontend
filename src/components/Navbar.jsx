@@ -91,7 +91,7 @@ export default function Navbar() {
                   <Link to="/diet" className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-green-700 transition">
                     <Salad className="w-4 h-4 text-green-400" /> Diet Plans
                   </Link>
-                  <Link to="/workout" className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                  <Link to="/workouts" className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-green-700 transition">
                     <Dumbbell className="w-4 h-4 text-blue-400" /> Workouts
                   </Link>
                   <Link to="/water" className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-green-700 transition">
