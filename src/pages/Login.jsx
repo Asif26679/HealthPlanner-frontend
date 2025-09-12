@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import api from "../utils/api";
-import { motion } from "framer-motion";
-import Particles from "react-tsparticles";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,111 +17,97 @@ export default function Login() {
     setLoading(true);
 
     if (!email || !password) {
-      setError("Please provide email and password");
+      setError("Please enter email and password");
       setLoading(false);
       return;
     }
 
     try {
-      const { data } = await api.post("/users/login", { email, password });
-      login(data.user, data.token);
-      navigate("/dashboard");
+      // Replace with your API call
+      const { data } = await fetch("/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }).then((res) => res.json());
+
+      if (data?.user && data?.token) {
+        login(data.user, data.token);
+        navigate("/dashboard");
+      } else {
+        setError(data.message || "Login failed");
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gray-900 px-4 overflow-hidden">
-      {/* Particles background */}
-      <Particles
-        className="absolute top-0 left-0 w-full h-full"
-        options={{
-          particles: {
-            number: { value: 50, density: { enable: true, area: 800 } },
-            size: { value: 3, random: true },
-            move: { speed: 1 },
-            line_linked: { enable: true, opacity: 0.2 },
-          },
-        }}
-      />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 relative overflow-hidden">
+      {/* Background floating circles */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <span className="absolute bg-indigo-500 opacity-20 rounded-full w-72 h-72 -top-32 -left-32 animate-ping-slow"></span>
+        <span className="absolute bg-pink-500 opacity-20 rounded-full w-64 h-64 -bottom-24 -right-20 animate-ping-slow"></span>
+        <span className="absolute bg-yellow-400 opacity-20 rounded-full w-80 h-80 -bottom-40 left-1/2 animate-ping-slow"></span>
+      </div>
 
-      {/* Login card */}
-      <motion.div
-        initial={{ opacity: 0, y: -60 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="relative z-10 bg-gray-800/70 backdrop-blur-2xl rounded-3xl p-10 w-full max-w-md shadow-2xl border border-gray-700"
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="text-4xl text-white font-extrabold text-center mb-6"
-        >
-          Welcome Back
-        </motion.h2>
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-md p-10 bg-gray-800/80 backdrop-blur-md rounded-3xl shadow-2xl animate-fade-in">
+        <h2 className="text-4xl font-bold text-white text-center mb-8">Welcome Back</h2>
 
-        {error && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="text-red-500 text-center mb-4"
-          >
-            {error}
-          </motion.p>
-        )}
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-5">
-          <motion.input
-            whileFocus={{ scale: 1.02 }}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-gray-700/80 text-white rounded-2xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400 transition"
+            className="w-full px-5 py-3 rounded-xl bg-gray-700/70 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             required
           />
-          <motion.input
-            whileFocus={{ scale: 1.02 }}
+          <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-gray-700/80 text-white rounded-2xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400 transition"
+            className="w-full px-5 py-3 rounded-xl bg-gray-700/70 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             required
           />
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             type="submit"
             disabled={loading}
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-2xl shadow-lg transition"
+            className="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold text-lg shadow-lg transition transform hover:scale-105"
           >
             {loading ? "Logging in..." : "Login"}
-          </motion.button>
+          </button>
         </form>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="text-gray-400 text-center mt-6 text-sm"
-        >
+        <p className="text-gray-400 text-center mt-6">
           Don't have an account?{" "}
           <span
-            className="text-indigo-400 hover:underline cursor-pointer"
+            className="text-indigo-400 hover:text-indigo-500 font-semibold cursor-pointer transition"
             onClick={() => navigate("/sign-up")}
           >
             Sign Up
           </span>
-        </motion.p>
-      </motion.div>
-    </div>  
+        </p>
+      </div>
+
+      {/* Tailwind Animations */}
+      <style>
+        {`
+          @keyframes ping-slow {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+          }
+          .animate-ping-slow { animation: ping-slow 6s infinite; }
+          @keyframes fade-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+          .animate-fade-in { animation: fade-in 0.8s ease forwards; }
+        `}
+      </style>
+    </div>
   );
 }
 
-// Test
