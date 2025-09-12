@@ -1,64 +1,54 @@
-import React from "react";
-import { motion, animate } from "framer-motion";
+import { Flame, Download } from "lucide-react";
+import { motion } from "framer-motion";
 
-export default function StatsCard({ title, value, icon: Icon, gradient, onClick }) {
-  const [animatedValue, setAnimatedValue] = React.useState(0);
-
-  React.useEffect(() => {
-    if (typeof value === "string" && value.match(/\d/)) {
-      const num = parseInt(value);
-      const controls = animate(0, num, {
-        duration: 2,
-        ease: "easeOut",
-        onUpdate: (v) => setAnimatedValue(Math.floor(v)),
-      });
-      return () => controls.stop();
-    }
-  }, [value]);
-
+function StatCard({ title, value, icon: Icon, onClick, gradient }) {
   return (
     <motion.div
-      whileHover={{ scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 200, damping: 15 }}
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 300 }}
       onClick={onClick}
-      className="relative group p-6 rounded-2xl shadow-lg cursor-pointer overflow-hidden bg-gray-900/80 backdrop-blur-xl border border-gray-700 hover:border-green-400 transition"
+      className={`flex items-center justify-between rounded-xl p-5 shadow-md cursor-pointer 
+        bg-gradient-to-br ${gradient} text-white hover:shadow-lg hover:shadow-black/30`}
     >
-      {/* Glow border effect */}
-      <div
-        className={`absolute inset-0 rounded-2xl opacity-20 ${gradient}`}
-      />
-
-      {/* Card content */}
-      <div className="relative z-10 flex flex-col items-center text-center space-y-3">
-        {Icon && (
-          <div className="relative">
-            {/* Icon aura glow */}
-            <motion.div
-              className="absolute inset-0 rounded-full blur-xl opacity-40"
-              style={{ background: "radial-gradient(circle, rgba(0,255,200,0.5), transparent)" }}
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            />
-            <div className="p-4 rounded-full bg-gray-800/90 backdrop-blur-lg">
-              <Icon className="w-10 h-10 text-white" />
-            </div>
-          </div>
-        )}
-
-        <h2 className="text-lg font-semibold text-gray-300">{title}</h2>
-        <motion.p
-          key={animatedValue}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600"
-        >
-          {title === "Total Calories" ? `${animatedValue} kcal` : value}
-        </motion.p>
+      <div>
+        <p className="text-sm text-gray-200">{title}</p>
+        {value && <p className="text-2xl font-semibold">{value}</p>}
+      </div>
+      <div className="p-3 bg-black/30 rounded-lg">
+        <Icon size={26} />
       </div>
     </motion.div>
   );
 }
+
+{/* Stats Section */}
+{loadingDiet ? (
+  <div className="grid md:grid-cols-3 gap-6 mb-8">
+    {Array(3).fill().map((_, i) => (
+      <SkeletonCard key={i} />
+    ))}
+  </div>
+) : (
+  diets.length > 0 && (
+    <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <StatCard
+        title="Total Calories"
+        value={`${diets[0]?.totalCalories || 0} kcal`}
+        icon={Flame}
+        gradient="from-orange-500 to-yellow-500"
+      />
+
+      <StatCard
+        title="Export Report"
+        value="PDF"
+        icon={Download}
+        gradient="from-gray-700 to-gray-900"
+        onClick={() => exportDietPDF(diets[0], user)}
+      />
+    </div>
+  )
+)}
+
 
 
 
