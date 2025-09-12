@@ -115,48 +115,53 @@ export default function Dashboard() {
       {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
       {/* Sidebar */}
-      <div
-  ref={sidebarRef}
-  className={`fixed md:sticky top-0 left-0 h-screen w-64 
-    bg-gray-900/70 backdrop-blur-xl border-r border-gray-700/60 
-    shadow-xl transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-    md:translate-x-0 transition-transform duration-300 z-50 
-    flex flex-col justify-between`}
->
-  <div className="flex-1 flex flex-col px-6 py-6 space-y-6 overflow-y-auto">
-    {/* Logo / Title */}
-    <h2 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text mb-4">
-      Health Planner
-    </h2>
+      <div ref={sidebarRef} className={`fixed md:sticky top-0 left-0 h-screen w-64 bg-gray-800/80 backdrop-blur-md shadow-xl transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 transition-transform duration-300 z-50 flex flex-col justify-between`}>
+        <div className="overflow-y-auto flex-1 flex flex-col justify-between">
+          {/* Generate Diet Section */}
+          <div className="px-6 mt-6">
+            <button className="w-full flex justify-between items-center mb-2 text-green-400 font-semibold" onClick={() => setDietSectionOpen(!dietSectionOpen)}>
+              Generate Daily Diet {dietSectionOpen ? <ChevronUp /> : <ChevronDown />}
+            </button>
+            {dietSectionOpen && (
+              <form onSubmit={handleGenerateDiet} className="space-y-3">
+                <input type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" required />
+                <input type="number" placeholder="Weight (kg)" value={weight} onChange={(e) => setWeight(e.target.value)} className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" required />
+                <input type="number" placeholder="Height (cm)" value={height} onChange={(e) => setHeight(e.target.value)} className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400" required />
+                <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+                <select value={activityLevel} onChange={(e) => setActivityLevel(e.target.value)} className="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400">
+                  <option value="sedentary">Sedentary</option>
+                  <option value="lightly">Lightly Active</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="active">Active</option>
+                  <option value="very">Very Active</option>
+                </select>
+                <button type="submit" disabled={loadingDiet} className="bg-gradient-to-r from-green-400 to-green-600 w-full py-2 rounded-lg font-semibold shadow-lg hover:from-green-500 hover:to-green-700 transition flex justify-center items-center gap-2">
+                  {loadingDiet ? "Generating..." : "Generate"}
+                </button>
+              </form>
+            )}
+          </div>
 
-    {/* Nav Section */}
-    <div className="space-y-3">
-      <button className="flex items-center gap-3 px-3 py-2 rounded-lg 
-        bg-gray-800/60 hover:bg-gradient-to-r hover:from-green-500/20 hover:to-green-400/10 
-        transition-all">
-        <Utensils size={20} className="text-green-400" />
-        <span>Generate Diet</span>
-      </button>
-
-      <button className="flex items-center gap-3 px-3 py-2 rounded-lg 
-        bg-gray-800/60 hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-blue-400/10 
-        transition-all">
-        <User size={20} className="text-blue-400" />
-        <span>User Info</span>
-      </button>
-    </div>
-
-    {/* Divider */}
-    <div className="border-t border-gray-700/50 my-4" />
-
-    {/* Logout */}
-    <button className="flex items-center gap-3 px-3 py-2 rounded-lg 
-      bg-red-600/90 hover:bg-red-700 transition-all text-white shadow-lg">
-      <LogOut size={20} />
-      <span>Logout</span>
-    </button>
-  </div>
-</div>
+          {/* User Section */}
+          <div className="px-6 mt-6 border-t border-gray-700 pt-4">
+            <button className="w-full flex justify-between items-center mb-2 text-blue-400 font-semibold" onClick={() => setUserSectionOpen(!userSectionOpen)}>
+              User Info {userSectionOpen ? <ChevronUp /> : <ChevronDown />}
+            </button>
+            {userSectionOpen && (
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <User className="text-gray-300" /> <span className="font-semibold">{user?.name || "User"}</span>
+                </div>
+                <Link to="/profile" className="flex items-center gap-2 mb-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg w-full justify-center transition">Edit Profile</Link>
+                <button onClick={handleLogout} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg w-full justify-center transition"><LogOut size={18} /> Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 p-6 md:ml-64">
