@@ -47,48 +47,48 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <p className="text-center text-gray-700 text-xl mt-20">Loading...</p>;
+  if (loading) return <p className="text-center text-gray-300 text-xl mt-20">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">My Profile</h2>
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-3xl bg-gray-900 rounded-2xl shadow-xl p-8">
+        <h2 className="text-3xl font-bold text-white mb-8 text-center">My Profile</h2>
 
         {error && <p className="text-red-500 text-center mb-6">{error}</p>}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name Card */}
-          <div className="p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
+          <div className="p-6 bg-gray-800 rounded-xl border border-gray-700 shadow-sm">
             <div className="flex items-center mb-4">
-              <UserCircle2 className="w-5 h-5 text-gray-500 mr-2" />
-              <label className="text-gray-700 font-medium">Name</label>
+              <UserCircle2 className="w-5 h-5 text-indigo-400 mr-2" />
+              <label className="text-gray-300 font-medium">Name</label>
             </div>
             <input
               type="text"
               name="name"
               value={profile.name}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
             />
             <button
               onClick={handleUpdateName}
-              className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-md transition"
+              className="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 rounded-md transition"
             >
               Update Name
             </button>
           </div>
 
           {/* Email Card */}
-          <div className="p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
+          <div className="p-6 bg-gray-800 rounded-xl border border-gray-700 shadow-sm">
             <div className="flex items-center mb-4">
-              <UserCircle2 className="w-5 h-5 text-gray-500 mr-2" />
-              <label className="text-gray-700 font-medium">Email</label>
+              <UserCircle2 className="w-5 h-5 text-indigo-400 mr-2" />
+              <label className="text-gray-300 font-medium">Email</label>
             </div>
             <input
               type="email"
               value={profile.email}
               disabled
-              className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-100 cursor-not-allowed text-gray-600"
+              className="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-gray-300 cursor-not-allowed"
             />
           </div>
         </div>
@@ -96,10 +96,10 @@ export default function Profile() {
         {/* Change Password */}
         <form
           onSubmit={handleChangePassword}
-          className="mt-10 p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-sm"
+          className="mt-10 p-6 bg-gray-800 rounded-xl border border-gray-700 shadow-sm"
         >
-          <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-            <Lock className="w-5 h-5 mr-2 text-gray-500" /> Change Password
+          <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+            <Lock className="w-5 h-5 mr-2 text-indigo-400" /> Change Password
           </h3>
           <div className="space-y-4">
             <input
@@ -107,14 +107,14 @@ export default function Profile() {
               name="currentPassword"
               placeholder="Current Password"
               required
-              className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-400"
             />
             <input
               type="password"
               name="newPassword"
               placeholder="New Password"
               required
-              className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-400"
             />
           </div>
           <button
