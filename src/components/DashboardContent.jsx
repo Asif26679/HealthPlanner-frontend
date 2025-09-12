@@ -77,14 +77,29 @@ export default function Dashboard() {
 
   const handleDeleteDiet = async (id) => {
     if (!window.confirm("Delete this diet?")) return;
+  
     try {
-      const token = localStorage.getItem("token");
-      await api.delete(`/diets/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      // Optional: check if diet exists in frontend state
+      const dietExists = diets.find((d) => d._id === id);
+      if (!dietExists) {
+        alert("Diet not found or already deleted.");
+        return;
+      }
+  
+      await api.delete(`/diets/${id}`);
       setDiets(diets.filter((d) => d._id !== id));
+      alert("Diet deleted successfully.");
     } catch (err) {
-      console.error(err);
+      if (err.response?.status === 404) {
+        alert("Diet not found on server.");
+        setDiets(diets.filter((d) => d._id !== id)); // remove from state anyway
+      } else {
+        console.error(err);
+        alert(err.response?.data?.message || "Failed to delete diet.");
+      }
     }
   };
+  
 
   const handleLogout = () => {
     localStorage.clear();
