@@ -45,7 +45,8 @@ export default function Login() {
         className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
         style={{ backgroundImage: "url('your-image-url.jpg')" }}
       ></motion.div>
-
+<div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-green-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-green-400/10 rounded-full blur-2xl animate-pulse"></div>
       <div className="relative z-10 w-full max-w-md p-8 bg-gray-900 bg-opacity-60 backdrop-blur-md rounded-3xl shadow-lg">
         <h2 className="text-3xl font-bold text-center text-white mb-6">Welcome Back</h2>
 
