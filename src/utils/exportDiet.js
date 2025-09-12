@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable"; // ✅ Import separately
 
 export const exportDietPDF = (diet) => {
   if (!diet) return alert("No diet data found!");
@@ -33,7 +33,7 @@ export const exportDietPDF = (diet) => {
       item.fats,
     ]) || [];
 
-    doc.autoTable({
+    autoTable(doc, {
       startY,
       head: [["#", "Food", "Calories", "Protein", "Carbs", "Fats"]],
       body: mealData,
@@ -49,7 +49,7 @@ export const exportDietPDF = (diet) => {
   // Totals
   doc.setFontSize(14);
   doc.text("Totals", 14, startY);
-  doc.autoTable({
+  autoTable(doc, {
     startY: startY + 4,
     head: [["Calories", "Protein", "Carbs", "Fats"]],
     body: [
