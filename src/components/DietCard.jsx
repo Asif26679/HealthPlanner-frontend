@@ -1,16 +1,24 @@
 import React, { useState } from "react";
-import { Trash2, Clock, Zap } from "lucide-react"; // Zap for calories
+import { Trash2, Clock, Coffee, Apple, Meat, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const mealColors = [
-  "from-green-400 to-green-600",
-  "from-orange-400 to-orange-600",
-  "from-blue-400 to-blue-600",
-  "from-pink-400 to-pink-600",
+  "from-yellow-400 to-yellow-500", // Breakfast
+  "from-orange-400 to-orange-500", // Lunch
+  "from-red-400 to-red-500",       // Dinner
+  "from-green-400 to-green-500",   // Snacks
 ];
 
 export default function DietCard({ diet, handleDeleteDiet }) {
   const [expandedMeal, setExpandedMeal] = useState(null);
+
+  const getMealIcon = (name) => {
+    name = name.toLowerCase();
+    if (name.includes("breakfast")) return <Coffee size={20} />;
+    if (name.includes("lunch")) return <Apple size={20} />;
+    if (name.includes("dinner")) return <Meat size={20} />;
+    return <Zap size={20} />;
+  };
 
   return (
     <motion.div
@@ -18,11 +26,11 @@ export default function DietCard({ diet, handleDeleteDiet }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl p-5 mb-6 hover:scale-[1.02] transform transition-all duration-300"
+      className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl shadow-2xl p-5 mb-6 hover:scale-[1.02] transition-all duration-300"
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-        <h2 className="text-lg sm:text-xl font-bold text-white">{diet.title || "Diet Plan"}</h2>
+        <h2 className="text-xl font-bold text-white">{diet.title || "Diet Plan"}</h2>
         <div className="flex items-center gap-2 text-green-400 font-semibold">
           <Zap size={18} /> {diet.totalCalories || 0} kcal
         </div>
@@ -33,7 +41,7 @@ export default function DietCard({ diet, handleDeleteDiet }) {
         {(diet.meals || []).map((meal, idx) => (
           <div
             key={idx}
-            className={`rounded-xl overflow-hidden bg-gradient-to-r ${mealColors[idx % mealColors.length]} shadow-lg`}
+            className={`rounded-2xl overflow-hidden bg-gradient-to-r ${mealColors[idx % mealColors.length]} shadow-lg`}
           >
             <button
               onClick={() =>
@@ -41,7 +49,10 @@ export default function DietCard({ diet, handleDeleteDiet }) {
               }
               className="w-full flex justify-between items-center px-4 py-3 font-semibold text-gray-900 hover:bg-white/20 transition"
             >
-              <span>{meal.name}</span>
+              <div className="flex items-center gap-2">
+                {getMealIcon(meal.name)}
+                <span>{meal.name}</span>
+              </div>
               <div className="flex items-center gap-2">
                 <Clock size={16} /> {meal.calories || 0} kcal
                 {expandedMeal === idx ? (
@@ -52,6 +63,7 @@ export default function DietCard({ diet, handleDeleteDiet }) {
               </div>
             </button>
 
+            {/* Food List */}
             <AnimatePresence initial={false}>
               {expandedMeal === idx && (
                 <motion.div
@@ -71,6 +83,13 @@ export default function DietCard({ diet, handleDeleteDiet }) {
                       <span>{food.calories || 0} kcal</span>
                     </div>
                   ))}
+
+                  {/* Optional: macros */}
+                  <div className="flex justify-between text-sm text-gray-200 mt-1">
+                    <span>Protein: {meal.protein || 0}g</span>
+                    <span>Carbs: {meal.carbs || 0}g</span>
+                    <span>Fat: {meal.fat || 0}g</span>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
