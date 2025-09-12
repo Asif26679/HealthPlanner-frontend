@@ -107,12 +107,12 @@ export default function Dashboard() {
     navigate("/login");
   };
 
-  const handleExportReport = () => {
-    if (!diets[0]) return alert("No diet to export");
-    const diet = diets[0];
-    const userInfo = { name: user.name, age, weight, height, gender, activityLevel };
-    exportDietPDF(userInfo, diet);
-  };
+  // const handleExportReport = () => {
+  //   if (!diets[0]) return alert("No diet to export");
+  //   const diet = diets[0];
+  //   const userInfo = { name: user.name, age, weight, height, gender, activityLevel };
+  //   exportDietPDF(userInfo, diet);
+  // };
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-black text-white pt-20 relative">
       {/* Mobile Overlay */}
@@ -182,7 +182,7 @@ export default function Dashboard() {
     title="Export Report"
     icon={FileText}
     gradient="bg-gradient-to-r from-green-400 to-green-600"
-    onClick={handleExportReport} // function to generate PDF
+    onClick={() => exportDietPDF(diets[0])} // function to generate PDF
   />
           </div>
         )}

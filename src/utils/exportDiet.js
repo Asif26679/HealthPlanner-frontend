@@ -2,59 +2,69 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 export const exportDietPDF = (diet) => {
+  if (!diet) return alert("No diet data found!");
+
   const doc = new jsPDF();
 
-  doc.setFontSize(16);
-  doc.text(diet.title || "Daily Diet", 14, 20);
+  // Title
+  doc.setFontSize(18);
+  doc.text(diet.title || "Daily Diet Plan", 14, 20);
 
-  // User info
+  // User Info
   doc.setFontSize(12);
   doc.text(`Age: ${diet.age || "-"}`, 14, 30);
   doc.text(`Weight: ${diet.weight || "-"} kg`, 14, 36);
   doc.text(`Height: ${diet.height || "-"} cm`, 14, 42);
   doc.text(`Gender: ${diet.gender || "-"}`, 14, 48);
 
-  let y = 55;
+  // Table for meals
+  let startY = 55;
+  diet.meals?.forEach((meal) => {
+    doc.setFontSize(14);
+    doc.text(`${meal.name}`, 14, startY);
+    startY += 6;
 
-  if (Array.isArray(diet.meals)) {
-    diet.meals.forEach((meal) => {
-      doc.setFontSize(14);
-      doc.text(meal.name || "-", 14, y);
-      y += 6;
+    const mealData = meal.items?.map((item, index) => [
+      index + 1,
+      item.name,
+      item.calories,
+      item.protein,
+      item.carbs,
+      item.fats,
+    ]) || [];
 
-      const mealData =
-        Array.isArray(meal.items) && meal.items.length > 0
-          ? meal.items.map((item) => [
-              item.name || "-",
-              item.calories || 0,
-              item.protein || 0,
-              item.carbs || 0,
-              item.fats || 0,
-            ])
-          : [];
-
-      if (mealData.length > 0) {
-        doc.autoTable({
-          startY: y,
-          head: [["Item", "Calories", "Protein", "Carbs", "Fats"]],
-          body: mealData,
-          theme: "grid",
-          headStyles: { fillColor: [34, 197, 94] },
-          styles: { fontSize: 10 },
-          margin: { left: 14, right: 14 },
-        });
-        y = doc.lastAutoTable.finalY + 10;
-      }
+    doc.autoTable({
+      startY,
+      head: [["#", "Food", "Calories", "Protein", "Carbs", "Fats"]],
+      body: mealData,
+      theme: "grid",
+      headStyles: { fillColor: [72, 187, 120] },
+      styles: { fontSize: 10 },
+      margin: { left: 14, right: 14 },
     });
-  }
 
+    startY = doc.lastAutoTable.finalY + 10;
+  });
+
+  // Totals
   doc.setFontSize(14);
-  doc.text(
-    `Total: ${diet.totalCalories || 0} kcal | Protein: ${diet.totalProtein || 0}g | Carbs: ${diet.totalCarbs || 0}g | Fats: ${diet.totalFats || 0}g`,
-    14,
-    y
-  );
+  doc.text("Totals", 14, startY);
+  doc.autoTable({
+    startY: startY + 4,
+    head: [["Calories", "Protein", "Carbs", "Fats"]],
+    body: [
+      [
+        diet.totalCalories || 0,
+        diet.totalProtein || 0,
+        diet.totalCarbs || 0,
+        diet.totalFats || 0,
+      ],
+    ],
+    theme: "grid",
+    headStyles: { fillColor: [72, 187, 120] },
+    styles: { fontSize: 10 },
+    margin: { left: 14, right: 14 },
+  });
 
-  doc.save(`${diet.title || "diet"}.pdf`);
+  doc.save(`${diet.title || "diet-plan"}.pdf`);
 };
-
