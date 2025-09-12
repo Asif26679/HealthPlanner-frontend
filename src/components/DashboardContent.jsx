@@ -187,8 +187,7 @@ export default function Dashboard() {
           title="Total Calories"
           value={`${diets[0]?.totalCalories || 0} kcal`}
           icon={Flame}
-          gradient="from-yellow-400 via-orange-500 to-red-500"
-          animateValue={true}
+          gradient="bg-gradient-to-r from-orange-500 to-yellow-400"
         />
       </motion.div>
 
