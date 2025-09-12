@@ -1,14 +1,13 @@
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import "jspdf-autotable";
 
 export const exportDietPDF = (diet) => {
   const doc = new jsPDF();
 
-  // Header
   doc.setFontSize(16);
   doc.text(diet.title || "Daily Diet", 14, 20);
 
-  // User Info
+  // User info
   doc.setFontSize(12);
   doc.text(`Age: ${diet.age || "-"}`, 14, 30);
   doc.text(`Weight: ${diet.weight || "-"} kg`, 14, 36);
@@ -17,7 +16,7 @@ export const exportDietPDF = (diet) => {
 
   let y = 55;
 
-  if (Array.isArray(diet.meals) && diet.meals.length > 0) {
+  if (Array.isArray(diet.meals)) {
     diet.meals.forEach((meal) => {
       doc.setFontSize(14);
       doc.text(meal.name || "-", 14, y);
@@ -35,7 +34,7 @@ export const exportDietPDF = (diet) => {
           : [];
 
       if (mealData.length > 0) {
-        autoTable(doc, {
+        doc.autoTable({
           startY: y,
           head: [["Item", "Calories", "Protein", "Carbs", "Fats"]],
           body: mealData,
@@ -44,13 +43,11 @@ export const exportDietPDF = (diet) => {
           styles: { fontSize: 10 },
           margin: { left: 14, right: 14 },
         });
-
         y = doc.lastAutoTable.finalY + 10;
       }
     });
   }
 
-  // Total Nutrition
   doc.setFontSize(14);
   doc.text(
     `Total: ${diet.totalCalories || 0} kcal | Protein: ${diet.totalProtein || 0}g | Carbs: ${diet.totalCarbs || 0}g | Fats: ${diet.totalFats || 0}g`,
@@ -60,3 +57,4 @@ export const exportDietPDF = (diet) => {
 
   doc.save(`${diet.title || "diet"}.pdf`);
 };
+
