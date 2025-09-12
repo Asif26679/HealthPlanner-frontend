@@ -34,18 +34,18 @@ function MealModal({ isOpen, onClose, meal }) {
             </p>
 
             <div className="space-y-2 max-h-72 overflow-y-auto">
-              {(meal.foods || []).map((food, idx) => (
+              {(meal.foods && meal.foods.length > 0 ? meal.foods : [{ name: "No foods available", calories: 0 }]).map((food, idx) => (
                 <div
                   key={idx}
                   className="flex justify-between bg-gray-800 px-4 py-2 rounded-lg"
                 >
-                  <span>{food.name}</span>
-                  <span>{food.calories || 0} kcal</span>
+                  <span>{food?.name}</span>
+                  <span>{food?.calories || 0} kcal</span>
                 </div>
               ))}
             </div>
 
-            {/* Optional: Macros */}
+            {/* Optional macros */}
             {meal.protein || meal.carbs || meal.fat ? (
               <div className="mt-4 flex justify-between text-sm text-gray-400">
                 <span>Protein: {meal.protein || 0}g</span>
@@ -60,7 +60,7 @@ function MealModal({ isOpen, onClose, meal }) {
   );
 }
 
-// Main DietCard
+// Main DietCard component
 export default function DietCard({ diet, onDelete }) {
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -71,14 +71,16 @@ export default function DietCard({ diet, onDelete }) {
     setModalOpen(true);
   };
 
+  // Gradient colors per meal
   const mealGradients = [
     "bg-gradient-to-r from-yellow-400 to-yellow-500", // Breakfast
     "bg-gradient-to-r from-orange-400 to-orange-500", // Lunch
-    "bg-gradient-to-r from-red-400 to-red-500", // Dinner
-    "bg-gradient-to-r from-green-400 to-green-500", // Snacks
+    "bg-gradient-to-r from-red-400 to-red-500",       // Dinner
+    "bg-gradient-to-r from-green-400 to-green-500",   // Snacks
   ];
 
-  const mealIcons = [Coffee,  Zap, Apple];
+  // Icons per meal
+  const mealIcons = [Coffee, Zap, Zap, Apple];
 
   return (
     <div className="bg-gray-900 rounded-2xl shadow-lg p-5 mb-6">
