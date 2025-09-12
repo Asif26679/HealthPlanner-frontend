@@ -37,7 +37,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-400 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 via-black to-gray-950 relative overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -46,8 +46,8 @@ export default function Login() {
         style={{ backgroundImage: "url('your-image-url.jpg')" }}
       ></motion.div>
 
-      <div className="relative z-10 w-full max-w-md p-8 bg-white bg-opacity-60 backdrop-blur-md rounded-3xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Welcome Back</h2>
+      <div className="relative z-10 w-full max-w-md p-8 bg-gray-900 bg-opacity-60 backdrop-blur-md rounded-3xl shadow-lg">
+        <h2 className="text-3xl font-bold text-center text-white mb-6">Welcome Back</h2>
 
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
