@@ -3,7 +3,8 @@ import api from "../utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Menu, X, LogOut, User, Utensils, Flame, Activity, ChevronDown, ChevronUp } from "lucide-react";
-import { motion } from "framer-motion";
+import jsPDF from "jspdf";
+
 
 import StatsCard from "./StatsCard";
 import DietCard from "./DietCard";
