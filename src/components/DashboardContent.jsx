@@ -185,12 +185,12 @@ export default function Dashboard() {
         icon={Flame}
         gradient="bg-gradient-to-r from-orange-500 to-yellow-400"
       />
-      <StatsCard
+      {/* <StatsCard
         title="Meals"
         value={diets[0]?.meals?.length || 0}
         icon={Utensils}
         gradient="bg-gradient-to-r from-green-400 to-green-600"
-      />
+      /> */}
       <StatsCard
         title="Export Report"
         icon={Download}
