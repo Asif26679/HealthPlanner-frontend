@@ -18,32 +18,28 @@ export default function StatsCard({ title, value, icon: Icon, gradient, onClick 
 
   return (
     <motion.div
-      whileHover={{ scale: 1.08 }}
+      whileHover={{ scale: 1.05 }}
       transition={{ type: "spring", stiffness: 200, damping: 15 }}
       onClick={onClick}
-      className="relative group p-6 rounded-2xl shadow-2xl cursor-pointer overflow-hidden"
+      className="relative group p-6 rounded-2xl shadow-lg cursor-pointer overflow-hidden bg-gray-900/80 backdrop-blur-xl border border-gray-700 hover:border-green-400 transition"
     >
-      {/* Animated gradient border */}
-      <motion.div
-        className={`absolute inset-0 rounded-2xl p-[2px] ${gradient}`}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-      >
-        <div className="h-full w-full rounded-2xl bg-gray-900/80 backdrop-blur-xl" />
-      </motion.div>
+      {/* Glow border effect */}
+      <div
+        className={`absolute inset-0 rounded-2xl opacity-20 ${gradient}`}
+      />
 
       {/* Card content */}
       <div className="relative z-10 flex flex-col items-center text-center space-y-3">
         {Icon && (
           <div className="relative">
-            {/* Icon aura */}
+            {/* Icon aura glow */}
             <motion.div
-              className="absolute inset-0 rounded-full blur-2xl opacity-50"
-              style={{ background: "radial-gradient(circle, rgba(0,255,200,0.6), transparent)" }}
-              animate={{ scale: [1, 1.2, 1] }}
+              className="absolute inset-0 rounded-full blur-xl opacity-40"
+              style={{ background: "radial-gradient(circle, rgba(0,255,200,0.5), transparent)" }}
+              animate={{ scale: [1, 1.15, 1] }}
               transition={{ repeat: Infinity, duration: 2 }}
             />
-            <div className="p-4 rounded-full bg-gray-800/80 backdrop-blur-lg">
+            <div className="p-4 rounded-full bg-gray-800/90 backdrop-blur-lg">
               <Icon className="w-10 h-10 text-white" />
             </div>
           </div>
