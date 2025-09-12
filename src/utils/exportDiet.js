@@ -11,6 +11,7 @@ export const exportDietPDF = (diet,user) => {
   doc.text(diet.title || "Daily Diet Plan", 14, 20);
 
   // User Info
+  let currentY = 30;
   doc.setFontSize(12);
   doc.text(`User: ${user?.name || "N/A"}`, 14, 30);
   currentY += 6;
