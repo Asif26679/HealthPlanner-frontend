@@ -8,12 +8,13 @@ export default function StatsCard({ title, value, icon: Icon, gradient, onClick 
 
   React.useEffect(() => {
     if (typeof value === "string" && value.match(/\d/)) {
-      const num = parseInt(value); // extract number
+      const num = parseInt(value);
       const controls = animate(0, num, {
         duration: 2,
+        ease: "easeOut",
         onUpdate: (v) => {
           setAnimatedValue(Math.floor(v));
-          setProgress(v / num); // progress in %
+          setProgress(v / num);
         },
       });
       return () => controls.stop();
@@ -22,26 +23,44 @@ export default function StatsCard({ title, value, icon: Icon, gradient, onClick 
 
   return (
     <motion.div
-      whileHover={{ scale: 1.05 }}
+      whileHover={{ scale: 1.07, boxShadow: "0px 0px 20px rgba(0,255,150,0.4)" }}
       onClick={onClick}
-      className="relative bg-gray-800 overflow-hidden p-6 rounded-2xl shadow-lg flex flex-col items-center cursor-pointer transition"
+      className="relative backdrop-blur-xl bg-gray-900/60 border border-white/10 p-6 rounded-2xl shadow-lg flex flex-col items-center cursor-pointer transition-all overflow-hidden"
     >
-      {/* Animated background fill */}
+      {/* Animated gradient fill */}
       <motion.div
-        className={`absolute inset-0 ${gradient} opacity-40`}
+        className={`absolute inset-0 ${gradient}`}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: progress }}
         transition={{ duration: 2, ease: "easeOut" }}
         style={{ originX: 0 }}
       />
 
-      {/* Content above the animation */}
-      <div className="relative z-10 flex flex-col items-center">
-        {Icon && <Icon className="w-8 h-8 mb-3 text-white" />}
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <p className="text-2xl font-bold mt-2">
+      {/* Subtle overlay for readability */}
+      <div className="absolute inset-0 bg-black/40" />
+
+      {/* Card content */}
+      <div className="relative z-10 flex flex-col items-center text-center">
+        {Icon && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="p-3 rounded-full bg-white/10 backdrop-blur-lg mb-3"
+          >
+            <Icon className="w-8 h-8 text-white" />
+          </motion.div>
+        )}
+        <h2 className="text-lg font-semibold text-gray-200">{title}</h2>
+        <motion.p
+          key={animatedValue}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="text-3xl font-extrabold mt-2 text-white"
+        >
           {title === "Total Calories" ? `${animatedValue} kcal` : value}
-        </p>
+        </motion.p>
       </div>
     </motion.div>
   );
