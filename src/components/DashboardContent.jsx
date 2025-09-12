@@ -7,6 +7,7 @@ import SkeletonCard from "./SkeletonCard";
 import { exportDietPDF } from "../utils/exportDiet";
 import StatsCard from "./StatsCard";
 import DietCard from "./DietCard";
+import {motion} from 'framer-motion'
 
 export default function Dashboard() {
   const [diets, setDiets] = useState([]);
