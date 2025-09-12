@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import api from "../utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Menu, X, LogOut, User, Utensils, Flame, Activity, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, LogOut, User, Utensils, Flame,  FileText, ChevronDown, ChevronUp } from "lucide-react";
 import jsPDF from "jspdf";
 
 
@@ -222,7 +222,7 @@ export default function Dashboard() {
             <StatsCard title="Meals" value={diets[0]?.meals?.length || 0} icon={Utensils} gradient="bg-gradient-to-r from-green-400 to-green-600" />
             <StatsCard
     title="Export Report"
-    icon={Utensils}
+    icon={FileText}
     gradient="bg-gradient-to-r from-green-400 to-green-600"
     onClick={handleExportReport} // function to generate PDF
   />
