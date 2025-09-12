@@ -203,12 +203,18 @@ export default function Dashboard() {
 
         {/* Diet List */}
         <div className="grid md:grid-cols-2 gap-6">
-          {diets.length === 0 && <div className="col-span-full text-center text-gray-400">No diets yet. Use the form on the left to generate a diet!</div>}
-
-          {diets.map((diet) => (
-            <DietCard key={diet._id} diet={diet} handleDeleteDiet={handleDeleteDiet} />
-          ))}
-        </div>
+  {loadingDiet ? (
+    Array(2).fill().map((_, i) => <SkeletonCard key={i} />)
+  ) : diets.length === 0 ? (
+    <div className="col-span-full text-center text-gray-400">
+      No diets yet. Use the form on the left to generate a diet!
+    </div>
+  ) : (
+    diets.map((diet) => (
+      <DietCard key={diet._id} diet={diet} handleDeleteDiet={handleDeleteDiet} />
+    ))
+  )}
+</div>
       </div>
     </div>
   );
