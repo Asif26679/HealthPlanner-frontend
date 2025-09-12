@@ -16,7 +16,7 @@ export default function DietCard({ diet, handleDeleteDiet }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-gray-900 rounded-3xl shadow-2xl p-6 flex flex-col gap-5 hover:shadow-3xl transition-shadow"
+      className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl shadow-2xl p-6 flex flex-col gap-6 hover:shadow-3xl transition-shadow duration-300"
     >
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -31,38 +31,41 @@ export default function DietCard({ diet, handleDeleteDiet }) {
       </div>
 
       {/* Total Nutrition */}
-      <div className="grid grid-cols-3 gap-4 text-center bg-gray-800 rounded-2xl p-4">
+      <div className="grid grid-cols-3 gap-4 text-center bg-gray-800 rounded-2xl p-4 shadow-inner">
         <div className="flex flex-col items-center">
           <span className="text-lg font-bold">{diet.totalCalories || 0} kcal</span>
           <p className="text-sm text-gray-400">Calories</p>
+          <div className="w-full h-2 mt-1 bg-red-500 rounded-full" style={{ width: `${Math.min(diet.totalCalories / 2500, 1) * 100}%` }} />
         </div>
         <div className="flex flex-col items-center">
           <span className="text-lg font-bold">{diet.totalProtein || 0} g</span>
           <p className="text-sm text-gray-400">Protein</p>
+          <div className="w-full h-2 mt-1 bg-blue-500 rounded-full" style={{ width: `${Math.min(diet.totalProtein / 150, 1) * 100}%` }} />
         </div>
         <div className="flex flex-col items-center">
           <span className="text-lg font-bold">{diet.totalCarbs || 0} g</span>
           <p className="text-sm text-gray-400">Carbs</p>
+          <div className="w-full h-2 mt-1 bg-yellow-400 rounded-full" style={{ width: `${Math.min(diet.totalCarbs / 300, 1) * 100}%` }} />
         </div>
       </div>
 
       {/* Meals */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5">
         {diet.meals?.map((meal) => (
-          <div key={meal._id} className="bg-gray-800 rounded-2xl p-4">
+          <div key={meal._id} className="bg-gray-800 rounded-2xl p-4 shadow-md hover:shadow-lg transition duration-300">
             <h3
-              className={`font-semibold text-white text-lg mb-3 bg-gradient-to-r ${mealColors[meal.name] || "from-blue-400 to-blue-500"} inline-block px-3 py-1 rounded-full`}
+              className={`font-semibold text-white text-lg mb-4 bg-gradient-to-r ${mealColors[meal.name] || "from-blue-400 to-blue-500"} inline-block px-4 py-1 rounded-full shadow`}
             >
               {meal.name}
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {meal.items?.map((item) => (
                 <span
                   key={item._id}
-                  className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-full text-gray-200 text-sm flex items-center gap-1"
-                  title={`${item.name} - ${item.calories} kcal`}
+                  className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-full text-gray-200 text-sm flex justify-between items-center shadow-sm transition"
                 >
-                  {item.name} ({item.calories} kcal)
+                  <span>{item.name}</span>
+                  <span className="font-semibold text-green-400">{item.calories} kcal</span>
                 </span>
               ))}
             </div>
