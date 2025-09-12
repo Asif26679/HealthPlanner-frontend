@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable"; // ✅ Import separately
 
-export const exportDietPDF = (diet) => {
+export const exportDietPDF = (diet,user) => {
   if (!diet) return alert("No diet data found!");
 
   const doc = new jsPDF();
