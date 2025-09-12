@@ -38,10 +38,12 @@ export default function Profile() {
     e.preventDefault();
     const currentPassword = e.target.currentPassword.value;
     const newPassword = e.target.newPassword.value;
+  
     try {
       await api.put("/users/password", { currentPassword, newPassword });
-      alert("Password updated successfully");
-      e.target.reset();
+      alert("Password updated successfully. Please log in again.");
+  
+      logout(); // ✅ log out user
     } catch (err) {
       alert(err.response?.data?.message || "Failed to change password");
     }
