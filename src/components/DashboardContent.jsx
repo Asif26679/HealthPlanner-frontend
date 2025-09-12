@@ -168,8 +168,6 @@ export default function Dashboard() {
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden mb-4 p-2 bg-gray-800 rounded-lg shadow">{sidebarOpen ? <X size={20} /> : <Menu size={20} />}</button>
 
         <h1 className="text-3xl font-bold mb-8">👋 Hello, <span className="text-green-400">{user?.name || "User"}</span></h1>
-
-        {/* Stats */}
         {loadingDiet ? (
   <div className="grid md:grid-cols-3 gap-6 mb-8">
     {Array(3).fill().map((_, i) => (
@@ -179,19 +177,33 @@ export default function Dashboard() {
 ) : (
   diets.length > 0 && (
     <div className="grid md:grid-cols-3 gap-6 mb-8">
-      <StatsCard
-        title="Total Calories"
-        value={`${diets[0]?.totalCalories || 0} kcal`}
-        icon={Flame}
-        gradient="bg-gradient-to-r from-orange-500 to-yellow-400"
-      />
-      <StatsCard
-        title="Download Report"
-        icon={Download}
-        gradient="bg-gradient-to-r from-gray-600 to-gray-800"
-        className="text-white"
-        onClick={() => exportDietPDF(diets[0],user)}  
-      />
+      {/* Calories Card */}
+      <motion.div
+        whileHover={{ scale: 1.03 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
+        <StatsCard
+          title="Total Calories"
+          value={`${diets[0]?.totalCalories || 0} kcal`}
+          icon={Flame}
+          gradient="bg-gradient-to-r from-orange-500 to-yellow-400"
+        />
+      </motion.div>
+
+      {/* Download Report */}
+      <motion.div
+        whileHover={{ scale: 1.03 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
+        <StatsCard
+          title="Export Report"
+          value="PDF"
+          icon={Download}
+          gradient="bg-gradient-to-r from-gray-700 to-gray-900"
+          className="text-white cursor-pointer"
+          onClick={() => exportDietPDF(diets[0], user)}
+        />
+      </motion.div>
     </div>
   )
 )}
