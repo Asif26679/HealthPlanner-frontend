@@ -22,7 +22,7 @@ export const exportDietPDF = (diet,user) => {
   currentY += 10;
 
   // Table for meals
-  let startY = 55;
+  let startY = currentY;
   diet.meals?.forEach((meal) => {
     doc.setFontSize(14);
     doc.text(`${meal.name}`, 14, startY);
