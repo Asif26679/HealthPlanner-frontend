@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import { motion } from "framer-motion";
+import Particles from "react-tsparticles";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -36,20 +37,34 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 px-4">
+    <div className="relative min-h-screen flex items-center justify-center bg-gray-900 px-4 overflow-hidden">
+      {/* Particles background */}
+      <Particles
+        className="absolute top-0 left-0 w-full h-full"
+        options={{
+          particles: {
+            number: { value: 50, density: { enable: true, area: 800 } },
+            size: { value: 3, random: true },
+            move: { speed: 1 },
+            line_linked: { enable: true, opacity: 0.2 },
+          },
+        }}
+      />
+
+      {/* Login card */}
       <motion.div
-        initial={{ opacity: 0, y: -50 }}
+        initial={{ opacity: 0, y: -60 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="bg-gray-800/80 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md shadow-2xl border border-gray-700"
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative z-10 bg-gray-800/70 backdrop-blur-2xl rounded-3xl p-10 w-full max-w-md shadow-2xl border border-gray-700"
       >
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
           className="text-4xl text-white font-extrabold text-center mb-6"
         >
-          Login
+          Welcome Back
         </motion.h2>
 
         {error && (
@@ -70,7 +85,7 @@ export default function Login() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="bg-gray-700/80 text-white rounded-2xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400 transition"
             required
           />
           <motion.input
@@ -79,15 +94,15 @@ export default function Login() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="bg-gray-700/80 text-white rounded-2xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder-gray-400 transition"
             required
           />
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             type="submit"
             disabled={loading}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-xl transition"
+            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-3 rounded-2xl shadow-lg transition"
           >
             {loading ? "Logging in..." : "Login"}
           </motion.button>
@@ -96,8 +111,8 @@ export default function Login() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-gray-400 text-center mt-4 text-sm"
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="text-gray-400 text-center mt-6 text-sm"
         >
           Don't have an account?{" "}
           <span
