@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Trash2, Clock, Fire } from "lucide-react";
+import { Trash2, Clock, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const mealColors = [
@@ -24,7 +24,7 @@ export default function DietCard({ diet, handleDeleteDiet }) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h2 className="text-lg sm:text-xl font-bold text-white">{diet.title || "Diet Plan"}</h2>
         <div className="flex items-center gap-2 text-green-400 font-semibold">
-          <Fire size={18} /> {diet.totalCalories || 0} kcal
+          <Zap size={18} /> {diet.totalCalories || 0} kcal
         </div>
       </div>
 
