@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import api from "../utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Menu, X, LogOut, User, Utensils, Flame,  FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, LogOut, User, Utensils, Flame,  Download, ChevronDown, ChevronUp } from "lucide-react";
 import SkeletonCard from "./SkeletonCard";
 import { exportDietPDF } from "../utils/exportDiet";
 import StatsCard from "./StatsCard";
@@ -193,8 +193,8 @@ export default function Dashboard() {
       />
       <StatsCard
         title="Export Report"
-        icon={FileText}
-        gradient="bg-gradient-to-r from-green-400 to-green-600"
+        icon={Download}
+        gradient="bg-gradient-to-r from-gray-600 to-gray-800"
         onClick={() => exportDietPDF(diets[0],user)}  
       />
     </div>
