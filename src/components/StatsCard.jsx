@@ -1,6 +1,29 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 
-export default function StatCard({ title, value, icon: Icon, onClick, gradient, progress }) {
+export default function StatCard({ title, value, icon: Icon, onClick, gradient, progress, animateValue }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    if (!animateValue) return;
+    let start = 0;
+    const end = value || 0;
+    const duration = 1500; // animation duration in ms
+    const increment = end / (duration / 30); // 30ms interval
+
+    const counter = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setDisplayValue(end);
+        clearInterval(counter);
+      } else {
+        setDisplayValue(Math.floor(start));
+      }
+    }, 30);
+
+    return () => clearInterval(counter);
+  }, [value, animateValue]);
+
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -13,15 +36,10 @@ export default function StatCard({ title, value, icon: Icon, onClick, gradient, 
       <div className="flex items-center justify-between relative z-10">
         <div>
           <p className="text-sm text-gray-200 uppercase">{title}</p>
-          {value && (
-            <motion.p
-              className="text-2xl font-bold mt-1"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              {value}
-            </motion.p>
+          {value !== undefined && (
+            <p className="text-2xl font-bold mt-1">
+              {animateValue ? displayValue : value} {title === "Calories" ? "kcal" : ""}
+            </p>
           )}
         </div>
         {Icon && (
@@ -35,7 +53,7 @@ export default function StatCard({ title, value, icon: Icon, onClick, gradient, 
       {progress !== undefined && (
         <div className="absolute bottom-0 left-0 w-full h-2 bg-black/20 rounded-full mt-3 overflow-hidden">
           <motion.div
-            className="h-2 rounded-full bg-gradient-to-r from-green-400 to-green-600"
+            className={`h-2 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500`}
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 1.5, ease: "easeInOut" }}
@@ -45,3 +63,4 @@ export default function StatCard({ title, value, icon: Icon, onClick, gradient, 
     </motion.div>
   );
 }
+
