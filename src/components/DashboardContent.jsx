@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import { Menu, X, LogOut, User, Utensils, Flame,  FileText, ChevronDown, ChevronUp } from "lucide-react";
 import SkeletonCard from "./SkeletonCard";
 import { exportDietPDF } from "../utils/exportDiet";
-
 import StatsCard from "./StatsCard";
 import DietCard from "./DietCard";
 
@@ -29,6 +28,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoadingDiet(true);
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
 
@@ -36,6 +36,8 @@ export default function Dashboard() {
         setDiets(res.data || []);
       } catch (err) {
         console.error(err);
+      } finally{
+        setLoadingDiet(false);
       }
     };
     fetchData();
@@ -193,7 +195,7 @@ export default function Dashboard() {
         title="Export Report"
         icon={FileText}
         gradient="bg-gradient-to-r from-green-400 to-green-600"
-        onClick={() => exportDietPDF(diets[0], user)}
+        onClick={() => exportDietPDF(diets[0],user)}  
       />
     </div>
   )
