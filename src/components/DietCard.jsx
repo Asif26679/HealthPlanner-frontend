@@ -31,23 +31,7 @@ export default function DietCard({ diet, handleDeleteDiet }) {
       </div>
 
       {/* Total Nutrition */}
-      <div className="grid grid-cols-3 gap-4 text-center bg-gray-800 rounded-2xl p-4 shadow-inner">
-        <div className="flex flex-col items-center">
-          <span className="text-lg font-bold">{diet.totalCalories || 0} kcal</span>
-          <p className="text-sm text-gray-400">Calories</p>
-          <div className="w-full h-2 mt-1 bg-red-500 rounded-full" style={{ width: `${Math.min(diet.totalCalories / 2500, 1) * 100}%` }} />
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-lg font-bold">{diet.totalProtein || 0} g</span>
-          <p className="text-sm text-gray-400">Protein</p>
-          <div className="w-full h-2 mt-1 bg-blue-500 rounded-full" style={{ width: `${Math.min(diet.totalProtein / 150, 1) * 100}%` }} />
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-lg font-bold">{diet.totalCarbs || 0} g</span>
-          <p className="text-sm text-gray-400">Carbs</p>
-          <div className="w-full h-2 mt-1 bg-yellow-400 rounded-full" style={{ width: `${Math.min(diet.totalCarbs / 300, 1) * 100}%` }} />
-        </div>
-      </div>
+     
 
       {/* Meals */}
       <div className="flex flex-col gap-5">
