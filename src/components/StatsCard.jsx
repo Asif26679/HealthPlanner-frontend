@@ -50,5 +50,5 @@ function StatCard({ title, value, icon: Icon, onClick, gradient }) {
 )}
 
 
-
+export default StatCard
 
