@@ -47,86 +47,79 @@ export default function Profile() {
     }
   };
 
-  if (loading)
-    return <p className="text-center text-white text-xl mt-20 animate-pulse">Loading...</p>;
+  if (loading) return <p className="text-center text-gray-700 text-xl mt-20">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-4xl bg-gray-900/80 backdrop-blur-md border border-gray-700 rounded-3xl shadow-2xl p-10">
-        <h2 className="text-4xl md:text-5xl text-white font-extrabold mb-12 text-center tracking-wide">
-          My Profile
-        </h2>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8">
+        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">My Profile</h2>
 
-        {error && <p className="text-red-500 text-center mb-6 font-medium">{error}</p>}
+        {error && <p className="text-red-500 text-center mb-6">{error}</p>}
 
-        {/* Profile Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name Card */}
-          <div className="relative bg-gradient-to-br from-indigo-700/20 via-indigo-800/30 to-indigo-700/20 p-6 rounded-3xl shadow-lg hover:shadow-indigo-500/50 transition-all border border-indigo-600">
+          <div className="p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex items-center mb-4">
-              <UserCircle2 className="w-6 h-6 text-indigo-400 mr-3" />
-              <label className="text-gray-300 font-semibold">Name</label>
+              <UserCircle2 className="w-5 h-5 text-gray-500 mr-2" />
+              <label className="text-gray-700 font-medium">Name</label>
             </div>
-            <div className="relative">
-              <input
-                type="text"
-                name="name"
-                value={profile.name}
-                onChange={handleChange}
-                className="w-full px-5 py-3 rounded-xl bg-gray-800/70 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition shadow-inner"
-                placeholder="Enter your name"
-              />
-            </div>
+            <input
+              type="text"
+              name="name"
+              value={profile.name}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
             <button
               onClick={handleUpdateName}
-              className="mt-5 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 rounded-xl transition-all shadow-md hover:shadow-indigo-600/50"
+              className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-md transition"
             >
               Update Name
             </button>
           </div>
 
           {/* Email Card */}
-          <div className="relative bg-gradient-to-br from-pink-700/20 via-pink-800/30 to-pink-700/20 p-6 rounded-3xl shadow-lg hover:shadow-pink-500/50 transition-all border border-pink-600">
+          <div className="p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex items-center mb-4">
-              <UserCircle2 className="w-6 h-6 text-pink-400 mr-3" />
-              <label className="text-gray-300 font-semibold">Email</label>
+              <UserCircle2 className="w-5 h-5 text-gray-500 mr-2" />
+              <label className="text-gray-700 font-medium">Email</label>
             </div>
             <input
               type="email"
               value={profile.email}
               disabled
-              className="w-full px-5 py-3 rounded-xl bg-gray-800/70 text-gray-300 cursor-not-allowed border border-gray-600 placeholder-gray-400"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-100 cursor-not-allowed text-gray-600"
             />
           </div>
         </div>
 
-        {/* Change Password Section */}
+        {/* Change Password */}
         <form
           onSubmit={handleChangePassword}
-          className="mt-12 p-6 rounded-3xl bg-gradient-to-br from-red-800/20 via-red-900/30 to-red-800/20 shadow-lg hover:shadow-red-500/50 transition-all border border-red-600"
+          className="mt-10 p-6 bg-gray-50 rounded-xl border border-gray-200 shadow-sm"
         >
-          <h3 className="text-2xl md:text-3xl text-white font-semibold mb-6 flex items-center">
-            <Lock className="w-6 h-6 mr-3 text-red-400" /> Change Password
+          <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <Lock className="w-5 h-5 mr-2 text-gray-500" /> Change Password
           </h3>
-          <div className="space-y-5">
+          <div className="space-y-4">
             <input
               type="password"
               name="currentPassword"
               placeholder="Current Password"
               required
-              className="w-full px-5 py-3 rounded-xl bg-gray-800/70 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition shadow-inner"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
             />
             <input
               type="password"
               name="newPassword"
               placeholder="New Password"
               required
-              className="w-full px-5 py-3 rounded-xl bg-gray-800/70 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition shadow-inner"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
             />
           </div>
           <button
             type="submit"
-            className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-semibold transition-all shadow-md hover:shadow-red-600/50"
+            className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-md transition"
           >
             Change Password
           </button>
